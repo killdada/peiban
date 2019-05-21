@@ -1,0 +1,135 @@
+@import url('./var.less');
+
+:focus {
+    outline: none;
+}
+
+#app {
+    height: 100%;
+    min-width: 1280px;
+    overflow-y: hidden;
+    font-size: 16px;
+    background: @bgcolor-page;
+    color: @color-primary;
+    .page-sidebar{
+        border-right: 0;
+        padding-top: 20px;
+        .el-menu-item{
+            text-align: center;
+        }
+    }
+    >.el-header {
+        background: #fff;
+        box-shadow: @shadow-base;
+    }
+    .el-aside {
+        background: #fff;
+        // box-shadow: 4px 60px 10px 0 #ECEEF1;
+        z-index: 1;
+    }
+    > .el-main {
+        padding: 0;
+        // width: 1200px;
+        // margin: 0 auto;
+        flex-basis: 100%;
+        > .el-container {
+            border-top: 1px solid #F4F5F9;
+        }
+    }
+    &.is-index {
+        background: url('~assets/img/img_home_illu_def.png') bottom ~'/' 100% no-repeat;
+    }
+}
+
+.btn-danger {
+    color: #F26175;
+    &:hover, &:focus {
+        color: #F26175;
+    }
+}
+
+.el-dialog {
+    .el-dialog__header {
+        padding: 12px 20px;
+        background-color: @dialog-bg-color;
+    }
+    .el-dialog__title {
+        font-weight: 700;
+        font-size: 14px;
+        color: #333;
+    }
+}
+
+.page-container {
+    height: 100%;
+    .el-menu-item {
+        // height: 104px;
+        padding: 20px;
+        text-align: center;
+        line-height: 1;
+        font-size: 16px;
+        color: @color-gray;
+        &:hover {
+            background: @color-menu-hover;
+        }
+        &.is-active {
+            color: @color-blue;
+        }
+    }
+    .page-sidebar {
+        height: 100%;
+        padding-top: 20px;
+        min-height: 540px;
+        position: relative;
+        background: url('~assets/img/img_basic_illu_def.png') center 96%
+            no-repeat;
+    }
+    .el-main{
+        background: #fff;
+    }
+}
+
+
+
+.el-table{
+    // border-left: none;
+    // border-right: none;
+    &.hadBorder{
+        border-left: 1px solid @border-color;
+        border-right: 1px solid @border-color;
+    }
+    .el-table__header{
+        th{
+            padding-top: 5px;
+            padding-bottom: 5px;
+            border-top: 1px solid #E6EAEE;
+            background: #F5F8FA;
+            font-size: 12px;
+            color: #7F8FA4;
+            font-weight: normal
+        }
+    }
+    .index-col{
+        text-align: center
+    }
+    .circle{
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #fff;
+        border: 2px solid #fff;
+        margin-right: 5px;
+        position: relative;
+        top: 1px;
+        &.green{
+            border-color: #84b800
+        }
+         &.blue{
+            border-color: #1a91eb
+        }
+         &.red{
+            border-color: #f8726e
+        }
+    }
+}
