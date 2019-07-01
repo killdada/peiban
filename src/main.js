@@ -1,5 +1,3 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import ElementUI from 'element-ui'
 import 'src/utils/polyfill'
@@ -19,7 +17,6 @@ Vue.config.productionTip = false
 
 router.beforeEach((to, from, next) => {
     next()
-    // 如果 匹配的路由层级 中 包含需要『登录』,根据相关的token匹配
     // if (to.matched.some(record => record.meta && record.meta.requireLogin)) {
     //     if (cookie.get('token')) {
     //         next()

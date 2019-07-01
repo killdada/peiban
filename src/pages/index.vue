@@ -28,11 +28,42 @@
 
 <script>
 const menus = [
-    { name: 'banner-list', icon: 'el-icon-menu', title: '轮播管理' },
-    { name: 'category-list', icon: 'el-icon-menu', title: '分类管理' },
-    { name: 'lesson-list', icon: 'el-icon-menu', title: '课程管理' },
-    { name: 'practice-list', icon: 'el-icon-menu', title: '练习管理' },
-    { name: 'member-list', icon: 'el-icon-menu', title: '人员管理' }
+    {
+        name: 'banner-list',
+        icon: 'el-icon-menu',
+        title: '轮播管理',
+        routeName: '轮播列表'
+    },
+    {
+        name: 'category-list',
+        icon: 'el-icon-menu',
+        title: '分类管理',
+        routeName: '分类列表'
+    },
+    {
+        name: 'lesson-list',
+        icon: 'el-icon-menu',
+        title: '课程管理',
+        routeName: '课程列表'
+    },
+    {
+        name: 'practice-list',
+        icon: 'el-icon-menu',
+        title: '练习管理',
+        routeName: '练习列表'
+    },
+    {
+        name: 'member-list',
+        icon: 'el-icon-menu',
+        title: '人员管理',
+        routeName: '人员列表'
+    },
+    {
+        name: 'material-manage',
+        icon: 'el-icon-menu',
+        title: '素材管理',
+        routeName: '素材管理'
+    }
 ]
 
 export default {
@@ -47,14 +78,7 @@ export default {
     computed: {
         routes() {
             const name = this.$route.name
-            if (name === 'lesson-list') {
-                return [
-                    {
-                        name: '课程列表',
-                        to: { name: 'lesson-list' }
-                    }
-                ]
-            } else if (name === 'lesson-list') {
+            if (name === 'lesson-detail') {
                 return [
                     {
                         name: '课程列表',
@@ -62,32 +86,13 @@ export default {
                     },
                     { name: this.$route.params.id ? '课程详情' : '新建课程' }
                 ]
-            } else if (name === 'banner-list') {
-                return [
-                    {
-                        name: '轮播列表',
-                        to: { name: 'banner-list' }
-                    }
-                ]
-            } else if (name === 'member-list') {
-                return [
-                    {
-                        name: '人员列表',
-                        to: { name: 'member-list' }
-                    }
-                ]
-            } else if (name === 'category-list') {
-                return [
-                    {
-                        name: '分类列表',
-                        to: { name: 'category-list' }
-                    }
-                ]
             }
+            const menu = menus.find(item => item.name === name)
+            const routeName = menu ? menu.routeName : ''
             return [
                 {
-                    name: '练习列表',
-                    to: { name: 'practice-list' }
+                    name: routeName,
+                    to: { name }
                 }
             ]
         }

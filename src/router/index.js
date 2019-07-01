@@ -133,6 +133,27 @@ const routes = [
                 }
             }
         ]
+    },
+    // 素材管理
+    {
+        name: 'material',
+        path: '/material',
+        component: () => import('src/pages/index'),
+        redirect: '/material/manage',
+        meta: {
+            requireLogin: true
+        },
+        children: [
+            // 人员列表
+            {
+                name: 'material-manage',
+                path: 'manage',
+                component: () => import('src/pages/material/index'),
+                meta: {
+                    hasSideBar: true
+                }
+            }
+        ]
     }
 ]
 
