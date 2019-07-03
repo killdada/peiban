@@ -2,7 +2,7 @@ import Vue from 'vue'
 import ElementUI from 'element-ui'
 import 'src/utils/polyfill'
 import store from 'src/store'
-// import cookie from 'js-cookie'
+import cookie from 'js-cookie'
 import BaseComponents from 'components'
 import 'src/assets/less/base.less'
 import 'src/assets/less/common.less'
@@ -16,18 +16,17 @@ Vue.use(BaseComponents)
 Vue.config.productionTip = false
 
 router.beforeEach((to, from, next) => {
-    next()
-    // if (to.matched.some(record => record.meta && record.meta.requireLogin)) {
-    //     if (cookie.get('token')) {
-    //         next()
-    //     } else {
-    //         next({ path: '/login' })
-    //     }
-    // } else if (to.name === 'login' && cookie.get('token')) {
-    //     next({ name: 'lesson-list' })
-    // } else {
-    //     next()
-    // }
+    if (to.matched.some(record => record.meta && record.meta.requireLogin)) {
+        if (cookie.get('token')) {
+            next()
+        } else {
+            next({ path: '/login' })
+        }
+    } else if (to.name === 'login' && cookie.get('token')) {
+        next({ name: 'lesson-list' })
+    } else {
+        next()
+    }
 })
 
 /* eslint-disable no-new */

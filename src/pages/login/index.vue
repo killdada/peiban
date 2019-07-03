@@ -134,11 +134,13 @@ export default {
                         cookie.remove('user_remember')
                     }
                     login({
-                        name: this.formLogin.account,
+                        username: this.formLogin.account,
                         password: this.formLogin.password
                     })
                         .then(data => {
-                            cookie.set('token', data.token, { expires: 7 })
+                            cookie.set('token', data.access_token, {
+                                expires: 7
+                            })
                             location.reload()
                         })
                         .catch(err => {

@@ -47,6 +47,11 @@ const routes = [
                 meta: {
                     hasSideBar: true
                 }
+            },
+            {
+                name: 'lesson-catalog-bind-ppt',
+                path: 'catalog-bind-ppt/:id?',
+                component: () => import('src/pages/lesson/catalog-bind-ppt')
             }
         ]
     },

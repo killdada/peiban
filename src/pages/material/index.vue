@@ -1,61 +1,325 @@
 <template>
-    <el-tabs v-model="activeName" @tab-click="handleClick">
-        <el-tab-pane label="视频管理" name="vedio">视频管理</el-tab-pane>
-        <el-tab-pane label="音频管理" name="audio">音频管理</el-tab-pane>
-    </el-tabs>
+    <div class="page-material-manage">
+        <el-tabs v-model="activeName" @tab-click="handleClick">
+            <el-tab-pane
+                :label="item.name"
+                v-for="item in tabs"
+                :key="item.id"
+                :name="item.id"
+            >
+                <el-button
+                    type="primary"
+                    class="page-material-manage__add"
+                    @click="openDialog"
+                    size="medium"
+                >
+                    <a style="color: #fff">{{ item.addLabel }}</a>
+                </el-button>
+                <el-table :data="data" v-loading="loading.list">
+                    <el-table-column
+                        type="index"
+                        label-class-name="index-col"
+                        class-name="index-col"
+                        label="序号"
+                        width="70"
+                    >
+                    </el-table-column>
+                    <el-table-column
+                        prop="username"
+                        min-width="200"
+                        label="视频标题"
+                    >
+                    </el-table-column>
+                    <el-table-column
+                        prop="username"
+                        min-width="200"
+                        label="创建时间"
+                    >
+                    </el-table-column>
+                    <el-table-column label="操作" min-width="150">
+                        <template slot-scope="scope">
+                            <el-button type="text" @click="openEdit(scope.row)"
+                                >编辑</el-button
+                            >
+                            <el-button
+                                type="text"
+                                class="delete"
+                                @click="deleteMaterial(scope.row.id)"
+                                >删除</el-button
+                            >
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <page-pagination
+                    @currentChange="handleCurrentChange"
+                    :total="total"
+                ></page-pagination>
+            </el-tab-pane>
+        </el-tabs>
+        <el-dialog
+            :title="activeName === 'vedio' ? '上传视频' : '上传音频'"
+            :close-on-click-modal="false"
+            width="900px"
+            class="upload-dialog"
+            :visible.sync="showDialog"
+        >
+            <div class="upload-dialog__tips">
+                {{
+                    activeName === 'vedio'
+                        ? '并发最多同时上传3个视频，单个视频不超过5G'
+                        : '并发最多同时上传3个音频，单个音频不超过1G'
+                }}
+            </div>
+            <div class="upload-dialog__content">
+                <div id="uploadvideo-container">
+                    <el-button
+                        type="primary"
+                        @click="selectFile"
+                        size="medium"
+                        icon="el-icon-plus"
+                        >选择文件</el-button
+                    >
+                    <div class="file-input">
+                        <input
+                            type="file"
+                            id="uploadinput"
+                            multiple
+                            @change="changefile"
+                            accept="video/*"
+                        />
+                    </div>
+                </div>
+                <el-table :data="fileList">
+                    <el-table-column
+                        type="index"
+                        label-class-name="index-col"
+                        class-name="index-col"
+                        label="序号"
+                        width="70"
+                    >
+                    </el-table-column>
+                    <el-table-column prop="name" min-width="100" label="文件名">
+                    </el-table-column>
+                    <el-table-column label="文件大小">
+                        <template slot-scope="{ row }">
+                            {{ Math.ceil(row.size / 1024 / 1024) }} M
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作" min-width="300">
+                        <template slot-scope="{ row }">
+                            <div class="file-action-wrapper">
+                                <el-progress
+                                    :text-inside="true"
+                                    :stroke-width="20"
+                                    :percentage="row.percent"
+                                ></el-progress>
+                                <el-button
+                                    @click="fileSingleAction(row)"
+                                    v-if="row.status !== 'completed'"
+                                    size="small"
+                                    >{{ getBtnText(row.status) }}</el-button
+                                >
+                                <el-button v-else size="small"
+                                    >已完成</el-button
+                                >
+                            </div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div class="batch-btn" v-if="fileList.length">
+                    <el-button size="small" @click="fileActionAll"
+                        >全部开始上传</el-button
+                    >
+                    <el-button size="small" @click="fileActionAll('pause')"
+                        >全部暂停上传</el-button
+                    >
+                    <el-button size="small" @click="fileActionAll"
+                        >全部继续上传</el-button
+                    >
+                </div>
+            </div>
+        </el-dialog>
+        <el-dialog
+            :title="activeName === 'vedio' ? '视频编辑' : '音频编辑'"
+            :close-on-click-modal="false"
+            width="700px"
+            class="edit-dialog"
+            :visible.sync="showEditDialog"
+        >
+            <el-form ref="form" :model="form" label-width="80px" size="small">
+                <el-form-item
+                    :label="activeName === 'vedio' ? '视频标题' : '音频标题'"
+                >
+                    <el-input
+                        style="width: 300px;"
+                        v-model="form.username"
+                    ></el-input>
+                </el-form-item>
+            </el-form>
+            <div class="clearfix">
+                <el-button type="primary" @click="saveEdit" size="small"
+                    >保存</el-button
+                >
+            </div>
+        </el-dialog>
+    </div>
 </template>
 
 <script>
-import { getMemberList, getMemberStudyList, reportLink } from 'src/api/member'
+import { getMemberList } from 'src/api/member'
+import { qiniuUpload, pauseUpload } from 'src/utils/qiniu'
 
 export default {
     data() {
         return {
             activeName: 'vedio',
             data: [],
-            loading: false,
-            total: 0,
-            // key: '',
-            showDialog: false,
-            id: '', // 当前编辑的id,name
-            loadingDetail: false,
-            totalRecord: 0,
-            dataRecord: [],
-            reportLink,
             page: 1,
-            pageRecord: 1
+            total: 0,
+            showDialog: false,
+            showEditDialog: false,
+            form: {},
+            loading: {
+                list: false,
+                editFormBtn: false,
+                addMaterialBtn: false
+            },
+            tabs: [
+                {
+                    id: 'vedio',
+                    name: '视频管理',
+                    addLabel: '上传视频'
+                },
+                {
+                    id: 'audio',
+                    name: '音频管理',
+                    addLabel: '上传音频'
+                }
+            ],
+            fileList: []
         }
     },
     components: {},
     methods: {
-        handleClick() {},
-        format(time) {
-            const n = parseInt(time, 10)
-            const a = parseInt(n / 60, 10) // 多少分钟
-            const b = n % 60 // 余数秒
-            if (a >= 60) {
-                const c = a % 60 // 余数分
-                const d = parseInt(a / 60, 10) // 多少小时
-                return `${d}时${c}分${b}秒`
+        getBtnText(status) {
+            let text = '开始上传'
+            switch (status) {
+                case 'paused':
+                case 'error':
+                    text = '继续上传'
+                    break
+                case 'start':
+                    text = '暂停上传'
+                    break
+                default:
+                    break
             }
-            return `${a}分${b}秒`
+            return text
         },
-        createReport() {
-            //
+        updateFileItem(params, row) {
+            const { index } = row
+            this.$set(this.fileList, index, {
+                ...this.fileList[index],
+                ...params
+            })
         },
+        pauseUpload(row) {
+            pauseUpload(row, this.updateFileItem)
+        },
+        startUpload(row) {
+            qiniuUpload(row, this.updateFileItem)
+        },
+
+        fileSingleAction(row, forceStop) {
+            const { status = null } = row
+            if (status === 'completed') return
+            if (status === 'start' || forceStop) {
+                this.pauseUpload(row)
+            } else {
+                this.updateFileItem({ status: 'start' }, row)
+                this.startUpload(row)
+            }
+        },
+        fileActionAll(type) {
+            this.fileList.forEach(item => {
+                this.fileSingleAction(item, type === 'pause')
+            })
+        },
+        changefile() {
+            const files = document.getElementById('uploadinput').files
+            const result = []
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i]
+                // 同一个文件不需要操作
+                if (
+                    !this.fileList.find(
+                        item =>
+                            item.name === file.name && item.size === file.size
+                    )
+                ) {
+                    result.push({
+                        file,
+                        name: file.name,
+                        size: file.size,
+                        percent: 0,
+                        status: null
+                    })
+                }
+            }
+            this.fileList = this.fileList
+                .concat(result)
+                .map((item, i) => ({ ...item, index: i }))
+        },
+        selectFile() {
+            document.getElementById('uploadinput').click()
+        },
+        handleClick() {
+            this.page = 1
+            this.fileList = []
+            this.fetchData()
+        },
+        openDialog() {
+            this.showDialog = true
+        },
+        openEdit(row) {
+            this.form = row
+            this.showEditDialog = true
+        },
+        saveEdit() {
+            if (!this.form.username) {
+                return this.$message.info('标题不能为空')
+            }
+            if (this.loading.editFormBtn) {
+                return
+            }
+            this.loading.editFormBtn = true
+        },
+        deleteMaterial() {
+            this.$confirm('此操作将永久删除该素材, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            })
+                .then(() => {
+                    //
+                })
+                .catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    })
+                })
+        },
+
         handleCurrentChange(val) {
             this.page = val
             this.fetchData(val)
         },
-        handleCurrentChangeRecord(val) {
-            this.pageRecord = val
-            this.fetchDetail(val)
-        },
         fetchData(page) {
-            if (this.loading) {
+            if (this.loading.list) {
                 return
             }
-            this.loading = true
+            this.loading.list = true
 
             getMemberList({
                 page: page || this.page || 1
@@ -68,33 +332,7 @@ export default {
                     this.$message.error(e.message)
                 })
                 .finally(() => {
-                    this.loading = false
-                })
-        },
-
-        gotoEdit(item) {
-            this.showDialog = true
-            this.id = item.username
-            this.fetchDetail()
-        },
-        fetchDetail(page) {
-            if (this.loadingDetail) {
-                return
-            }
-            this.loadingDetail = true
-
-            getMemberStudyList(this.id, {
-                page: page || this.pageRecord || 1
-            })
-                .then(res => {
-                    this.dataRecord = res.list
-                    this.totalRecord = res.sum
-                })
-                .catch(e => {
-                    this.$message.error(e.message)
-                })
-                .finally(() => {
-                    this.loadingDetail = false
+                    this.loading.list = false
                 })
         }
     },
@@ -106,34 +344,68 @@ export default {
 
 <style lang="less" scoped>
 @import '~assets/less/var.less';
-.Member-form {
-    .el-input,
-    .el-textarea,
-    .el-select {
-        width: 400px;
+.file-action-wrapper {
+    display: flex;
+    .el-progress {
+        width: 250px;
+        margin-right: 10px;
     }
 }
-.submit-btn {
-    margin: 30px 0 10px;
-    text-align: right;
-    button {
-        min-width: 100px;
-    }
-}
-.page-Member-list {
-    height: 100%;
-    background-color: #fff;
-    header {
-        padding: 15px 20px;
-        text-align: right;
-        display: flex;
-        justify-content: space-between;
-        .el-input {
-            width: 300px;
+.upload-dialog {
+    &__content {
+        .el-table {
+            border-left: 1px solid @border-color;
+            border-right: 1px solid @border-color;
+        }
+        .batch-btn {
+            margin-top: 20px;
+            text-align: right;
         }
     }
-    .el-button.delete {
+}
+#uploadvideo-container {
+    position: relative;
+    margin: 10px 0;
+    .el-button {
+        position: relative;
+        z-index: 1;
+        min-width: 140px;
+    }
+    .file-input {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 140px;
+        height: 40px;
+        overflow: hidden;
+        z-index: 0;
+        input {
+            font-size: 999px;
+            opacity: 0;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 100%;
+            height: 100%;
+        }
+    }
+}
+.page-material-manage {
+    background-color: #fff;
+    padding: 20px;
+    &__add {
+        float: right;
+        margin-bottom: 20px;
+    }
+    .delete {
         color: @color-red;
+    }
+}
+.edit-dialog {
+    .el-button {
+        float: right;
+        min-height: 32px;
+        min-width: 80px;
     }
 }
 </style>

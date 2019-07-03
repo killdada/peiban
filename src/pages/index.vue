@@ -27,6 +27,8 @@
 </template>
 
 <script>
+import { getItem } from 'src/utils/localStorageUtils'
+
 const menus = [
     {
         name: 'banner-list',
@@ -85,6 +87,24 @@ export default {
                         to: { name: 'lesson-list' }
                     },
                     { name: this.$route.params.id ? '课程详情' : '新建课程' }
+                ]
+            }
+            if (name === 'lesson-catalog-bind-ppt') {
+                const {
+                    courseName = '课程名',
+                    catalogName = '目录名',
+                    lessonID
+                } = getItem('peibanData')
+                return [
+                    {
+                        name: '课程列表',
+                        to: { name: 'lesson-list' }
+                    },
+                    {
+                        name: `${courseName}-${catalogName}`,
+                        to: { name: 'lesson-detail', params: { id: lessonID } }
+                    },
+                    { name: '绑定ppt' }
                 ]
             }
             const menu = menus.find(item => item.name === name)

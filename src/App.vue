@@ -14,7 +14,7 @@
 
 <script>
 import UiHeader from 'components/header'
-// import cookie from 'js-cookie'
+import cookie from 'js-cookie'
 
 export default {
     name: 'faceVenueSignin',
@@ -28,8 +28,7 @@ export default {
     },
     computed: {
         isLogin() {
-            return true
-            // return cookie.get('token') ? 1 : 0
+            return cookie.get('token') ? 1 : 0
         }
     }
 }

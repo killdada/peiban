@@ -4,7 +4,6 @@ const LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
 // 使 chainableConfig.toString() 能使用
 LodashModuleReplacementPlugin.__expression = `require('lodash-webpack-plugin')`
 
-
 const alias = {
     src: path.resolve(__dirname, 'src'),
     assets: path.resolve(__dirname, 'src/assets'),
@@ -25,9 +24,11 @@ module.exports = {
                     // '^/api': '/api/v1/admin'
                 }
             }
-        },
+        }
     },
     chainWebpack: config => {
+        config.plugins.delete('preload')
+        config.plugins.delete('prefetch')
 
         Object.entries(alias).forEach(([key, value]) => {
             config.resolve.alias.set(key, value)

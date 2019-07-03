@@ -14,3 +14,8 @@ export function uploadFile(params) {
 export function getAllLesson() {
     return xhttp.get(extendUrl('/lesson/all'))
 }
+
+// 获取上传的token
+export function getQiniuToken() {
+    return xhttp.get(extendUrl('/qiniu_token'))
+}

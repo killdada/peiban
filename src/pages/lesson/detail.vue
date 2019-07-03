@@ -1,7 +1,7 @@
 <template>
     <div class="lesson-detail">
         <x-card title="课程信息">
-            <lesson-form> </lesson-form>
+            <lesson-form ref="lessonForm"> </lesson-form>
         </x-card>
 
         <x-card title="目录信息" v-loading="loading" class="catalog-info">
@@ -46,6 +46,10 @@
                         <el-button type="text" @click="openDialog(scope.row)"
                             >编辑</el-button
                         >
+                        <el-button type="text" @click="gotoBindppt(scope.row)"
+                            >绑定ppt</el-button
+                        >
+
                         <el-button
                             type="text"
                             class="delete"
@@ -70,6 +74,7 @@
 <script>
 import { uploadImg } from 'src/api/common'
 import { getCatalogList, delCatalog } from 'src/api/lesson'
+import { getItem, setItem } from 'src/utils/localStorageUtils'
 import catalogDialog from './catalog-dialog'
 import lessonForm from './lesson-form'
 
@@ -103,6 +108,16 @@ export default {
         }
     },
     methods: {
+        gotoBindppt({ id, name }) {
+            const data = getItem('peibanData', {})
+            setItem('peibanData', {
+                ...data,
+                lessonID: this.lessonID,
+                courseName: this.$refs.lessonForm.form.name,
+                catalogName: name
+            })
+            this.$router.push({ path: `/lesson/catalog-bind-ppt/${id}` })
+        },
         addsuccess() {
             this.fetchData()
         },
@@ -210,6 +225,9 @@ export default {
     }
     .el-dialog .el-button {
         min-width: 100px;
+    }
+    .delete {
+        color: @color-red;
     }
 }
 </style>

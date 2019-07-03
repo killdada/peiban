@@ -34,7 +34,7 @@
 
 <script>
 import cookie from 'js-cookie'
-import { logOut, getUserInfo } from 'src/api/login'
+import { logOut } from 'src/api/login'
 
 export default {
     name: 'Header',
@@ -52,14 +52,12 @@ export default {
     },
 
     created() {
-        // this.fetchData()
+        this.fetchData()
     },
 
     methods: {
         fetchData() {
-            getUserInfo().then(res => {
-                this.account = res.name
-            })
+            this.account = cookie.get('user_name')
         },
         keepMenu() {
             this.menuStatus.top = this.menuStatus.top || this.menuStatus.role
