@@ -1,74 +1,55 @@
 <template>
     <div class="page-material-manage">
-        <el-tabs v-model="activeName" @tab-click="handleClick">
-            <el-tab-pane
-                :label="item.name"
-                v-for="item in tabs"
-                :key="item.id"
-                :name="item.id"
+        <el-button
+            type="primary"
+            class="page-material-manage__add"
+            @click="openDialog"
+            size="medium"
+        >
+            <a style="color: #fff">上传素材</a>
+        </el-button>
+        <el-table :data="data" v-loading="loading.list">
+            <el-table-column
+                type="index"
+                label-class-name="index-col"
+                class-name="index-col"
+                label="序号"
+                width="70"
             >
-                <el-button
-                    type="primary"
-                    class="page-material-manage__add"
-                    @click="openDialog"
-                    size="medium"
-                >
-                    <a style="color: #fff">{{ item.addLabel }}</a>
-                </el-button>
-                <el-table :data="data" v-loading="loading.list">
-                    <el-table-column
-                        type="index"
-                        label-class-name="index-col"
-                        class-name="index-col"
-                        label="序号"
-                        width="70"
+            </el-table-column>
+            <el-table-column prop="username" min-width="200" label="视频标题">
+            </el-table-column>
+            <el-table-column prop="username" min-width="200" label="素材类型">
+            </el-table-column>
+            <el-table-column prop="username" min-width="200" label="创建时间">
+            </el-table-column>
+            <el-table-column label="操作" min-width="150">
+                <template slot-scope="scope">
+                    <el-button type="text" @click="openEdit(scope.row)"
+                        >编辑</el-button
                     >
-                    </el-table-column>
-                    <el-table-column
-                        prop="username"
-                        min-width="200"
-                        label="视频标题"
+                    <el-button
+                        type="text"
+                        class="delete"
+                        @click="deleteMaterial(scope.row.id)"
+                        >删除</el-button
                     >
-                    </el-table-column>
-                    <el-table-column
-                        prop="username"
-                        min-width="200"
-                        label="创建时间"
-                    >
-                    </el-table-column>
-                    <el-table-column label="操作" min-width="150">
-                        <template slot-scope="scope">
-                            <el-button type="text" @click="openEdit(scope.row)"
-                                >编辑</el-button
-                            >
-                            <el-button
-                                type="text"
-                                class="delete"
-                                @click="deleteMaterial(scope.row.id)"
-                                >删除</el-button
-                            >
-                        </template>
-                    </el-table-column>
-                </el-table>
-                <page-pagination
-                    @currentChange="handleCurrentChange"
-                    :total="total"
-                ></page-pagination>
-            </el-tab-pane>
-        </el-tabs>
+                </template>
+            </el-table-column>
+        </el-table>
+        <page-pagination
+            @currentChange="handleCurrentChange"
+            :total="total"
+        ></page-pagination>
         <el-dialog
-            :title="activeName === 'vedio' ? '上传视频' : '上传音频'"
+            title="上传素材"
             :close-on-click-modal="false"
             width="900px"
             class="upload-dialog"
             :visible.sync="showDialog"
         >
             <div class="upload-dialog__tips">
-                {{
-                    activeName === 'vedio'
-                        ? '并发最多同时上传3个视频，单个视频不超过5G'
-                        : '并发最多同时上传3个音频，单个音频不超过1G'
-                }}
+                并发最多同时上传3个素材，单个素材不超过5G
             </div>
             <div class="upload-dialog__content">
                 <div id="uploadvideo-container">
@@ -85,7 +66,7 @@
                             id="uploadinput"
                             multiple
                             @change="changefile"
-                            accept="video/*"
+                            accept="video/*,audio/*"
                         />
                     </div>
                 </div>
@@ -140,16 +121,14 @@
             </div>
         </el-dialog>
         <el-dialog
-            :title="activeName === 'vedio' ? '视频编辑' : '音频编辑'"
+            title="素材编辑"
             :close-on-click-modal="false"
             width="700px"
             class="edit-dialog"
             :visible.sync="showEditDialog"
         >
             <el-form ref="form" :model="form" label-width="80px" size="small">
-                <el-form-item
-                    :label="activeName === 'vedio' ? '视频标题' : '音频标题'"
-                >
+                <el-form-item label="素材标题">
                     <el-input
                         style="width: 300px;"
                         v-model="form.username"
@@ -172,7 +151,6 @@ import { qiniuUpload, pauseUpload } from 'src/utils/qiniu'
 export default {
     data() {
         return {
-            activeName: 'vedio',
             data: [],
             page: 1,
             total: 0,
@@ -184,18 +162,6 @@ export default {
                 editFormBtn: false,
                 addMaterialBtn: false
             },
-            tabs: [
-                {
-                    id: 'vedio',
-                    name: '视频管理',
-                    addLabel: '上传视频'
-                },
-                {
-                    id: 'audio',
-                    name: '音频管理',
-                    addLabel: '上传音频'
-                }
-            ],
             fileList: []
         }
     },
