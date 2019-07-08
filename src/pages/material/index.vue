@@ -219,6 +219,10 @@ export default {
                     this.$message.success('已经上传完成的视频保存成功')
                     this.fileList = newFileList
                     this.fetchData()
+                    // 全部都已经上传保存完成的情况下关闭弹窗。如果还有一个没有上传保存完成，弹窗不关闭
+                    if (!this.fileList.length) {
+                        this.showDialog = false
+                    }
                 } else {
                     this.$message.info('没有一个素材上传成功，无法保存')
                 }
