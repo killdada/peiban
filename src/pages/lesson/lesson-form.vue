@@ -34,11 +34,8 @@
             <el-form-item label="课程图片" prop="img">
                 <img-loader
                     v-model="form.imgUrl"
-                    :action="action"
-                    :data="imgData"
-                    :before-upload="beforeUpload"
-                    @success="onUploadSuccess"
-                    @error="onUploadError"
+                    :httpRequest="customUpload"
+                    action=""
                 >
                 </img-loader>
             </el-form-item>
@@ -68,6 +65,7 @@ import {
     addLesson,
     updateLesson
 } from 'src/api/lesson'
+import { qiniuUpload } from 'src/utils/qiniu'
 
 export default {
     data() {
@@ -114,24 +112,34 @@ export default {
             ],
 
             loadingDetail: false,
-            btnloading: false
+            btnloading: false,
+            fileData: {}
         }
     },
     methods: {
-        beforeUpload() {
-            //
-        },
-        onUploadSuccess(res) {
-            if (res.code === 200) {
-                this.form.imgUrl = res.data.media_real_url
-                this.form.img = res.data.media_id
-                this.$message.success('上传图片成功')
-            } else {
-                this.$message.error(`图片上传失败：${res.msg}`)
+        setImgurl(file) {
+            const reader = new FileReader()
+            reader.readAsDataURL(file)
+            reader.onload = () => {
+                this.form.imgUrl = reader.result
             }
         },
-        onUploadError() {
-            this.$message.error('图片上传失败')
+        update(params, row) {
+            this.fileData = {
+                ...this.fileData,
+                ...params
+            }
+            if (params.status === 'completed') {
+                this.$message.success('上传图片成功')
+                this.setImgurl(row.file)
+                this.form.img = this.fileData.key
+            } else if (params.status === 'error') {
+                this.$message.error('图片上传失败')
+            }
+        },
+        customUpload(data) {
+            this.fileData = { file: data.file }
+            qiniuUpload(this.fileData, this.update)
         },
         save() {
             this.$refs.form.validate(valid => {

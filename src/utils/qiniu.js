@@ -1,5 +1,15 @@
 import * as qiniu from 'qiniu-js'
 import { getQiniuToken } from 'src/api/common'
+const md5 = require('md5')
+
+// media_type 资源类型（1：图片，2：语音，3：视频，4：资源包, 5: 文档)）
+function getMediaType(type) {
+    if (~type.indexOf('video')) return 3
+    if (~type.indexOf('audio')) return 2
+    if (~type.indexOf('pdf')) return 5 // pdf
+    if (~type.indexOf('image')) return 1
+    return 4
+}
 
 /**
  *
@@ -13,12 +23,13 @@ async function getQiniuObservable(row, update) {
     if (observable) {
         return observable
     }
-    const key = file.name
+    const key = md5(new Date().getTime() + file.name)
     const { qiniu_token: token } = (await getQiniuToken()) || {}
     const putExtra = {}
     const config = {}
     const observableResult = qiniu.upload(file, key, token, putExtra, config)
-    update({ observable }, row)
+    const mediaType = getMediaType(file.type)
+    update({ observable, key, media_type: mediaType }, row)
     return observableResult
 }
 

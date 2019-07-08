@@ -1,5 +1,9 @@
 <template>
-    <div class="page-catalog-bind-ppt">
+    <div
+        class="page-catalog-bind-ppt"
+        v-loading.fullscreen="loadingPng"
+        element-loading-text="PDF转存png中"
+    >
         <div class="play-wrapper">
             <div id="player"></div>
         </div>
@@ -13,60 +17,65 @@
             >
                 <el-form-item prop="ppt">
                     <span slot="label" class="tips">
+                        上传pdf以后会生成对应的多种ppt图片。然后为每张图片绑定时间段。
                         先选中图片，然后为图片选择时间段提交绑定，选中的图片是白色的勾，图片未绑定时间段，边框颜色是红色的
                     </span>
-                    <el-upload
-                        accept="image/gif,image/jpeg,image/jpg,image/png,image/svg"
-                        class="imglist-container"
-                        :action="action"
-                        :data="imgData"
-                        name="media"
-                        multiple
-                        :show-file-list="false"
-                        :before-upload="beforeUpload"
-                        :on-success="onUploadSuccess"
-                        :on-error="onUploadError"
-                    >
-                        <template v-if="form.ppt.length">
-                            <draggable
-                                v-model="form.ppt"
-                                class="drag-container"
-                                @end="dragEnd"
-                                :options="{ draggable: '.draggable-item' }"
-                            >
-                                <div
-                                    v-for="(img, index) in form.ppt"
-                                    class="imglist-item draggable-item"
-                                    :class="
-                                        error.filter(e => e === index + 1)
-                                            .length && 'is-error'
-                                    "
-                                    @click.stop.prevent="selectImg(img, index)"
-                                    :key="img.id"
-                                >
-                                    <img :src="img.media_real_url" alt="" />
-                                    <i
-                                        class="el-icon-circle-close delete"
-                                        @click.stop.prevent="delImg(img, index)"
-                                    ></i>
-                                    <div v-if="activeID === img.media_id">
-                                        <div class="mask"></div>
-                                        <i class="el-icon-check check"></i>
-                                    </div>
-                                </div>
-                                <div class="imglist-item noimg">
-                                    <i class="el-icon-plus plus"></i>
-                                </div>
-                            </draggable>
-                        </template>
-                        <div class="imglist-item noimg" v-else>
-                            <i class="el-icon-plus plus"></i>
-                        </div>
-                    </el-upload>
+                    <div>
+                        <el-button
+                            size="small"
+                            :loading="uploading"
+                            @click="selectFile"
+                            >{{
+                                !form.ppt.length && !fileData.name
+                                    ? '点击上传pdf'
+                                    : '重新上传pdf'
+                            }}</el-button
+                        >
+                        <input
+                            type="file"
+                            id="upload"
+                            style="display: none"
+                            accept="application/pdf"
+                            @change="uploadfile"
+                        />
+                    </div>
 
-                    <div style="margin-top: 10px" v-if="form.ppt.length">
+                    <template v-if="form.ppt.length">
+                        <draggable
+                            v-model="form.ppt"
+                            class="drag-container"
+                            @end="dragEnd"
+                            :options="{ draggable: '.draggable-item' }"
+                        >
+                            <div
+                                v-for="(img, index) in form.ppt"
+                                class="imglist-item draggable-item"
+                                :class="
+                                    error.filter(e => e === index + 1).length &&
+                                        'is-error'
+                                "
+                                @click.stop.prevent="selectImg(img, index)"
+                                :key="img.id"
+                            >
+                                <img :src="img.media_real_url" alt="" />
+                                <i
+                                    class="el-icon-circle-close delete"
+                                    @click.stop.prevent="delImg(img, index)"
+                                ></i>
+                                <div v-if="activeID === img.media_id">
+                                    <div class="mask"></div>
+                                    <i class="el-icon-check check"></i>
+                                </div>
+                            </div>
+                        </draggable>
+                    </template>
+
+                    <div
+                        style="margin-top: 10px;position: relative;z-index: 10"
+                        v-if="form.ppt.length"
+                    >
                         <div v-for="(item, index) in form.ppt" :key="index">
-                            <div v-show="activeID === item.media_id">
+                            <div v-if="activeID === item.media_id">
                                 <el-time-picker
                                     is-range
                                     size="medium"
@@ -104,10 +113,11 @@
 
 <script>
 import loader from 'src/utils/loader'
-import { updateCatalog, getCatalogDetail } from 'src/api/lesson'
+import { updateCatalog, getCatalogDetail, getPdfimg } from 'src/api/lesson'
 import { uploadImg } from 'src/api/common'
 import { getItem } from 'src/utils/localStorageUtils'
 import draggable from 'vuedraggable'
+import { qiniuUpload } from 'src/utils/qiniu'
 
 const pptTimeDefault = ['00:00:00', '00:00:00']
 
@@ -156,7 +166,10 @@ export default {
             pptTime: [], // 多少张PPT就对应多少个ppttime
             activeID: '',
             activeIndex: 0,
-            lessonID: ''
+            lessonID: '',
+            fileData: {},
+            uploading: false,
+            loadingPng: false
         }
     },
     computed: {
@@ -165,6 +178,57 @@ export default {
         }
     },
     methods: {
+        selectFile() {
+            if (this.uploadlingVideo) {
+                return
+            }
+            document.getElementById('upload').click()
+        },
+        async uploadfile() {
+            const file = document.getElementById('upload').files[0]
+            const fileData = {
+                file,
+                name: file.name,
+                size: file.size,
+                percent: 0,
+                status: null
+            }
+            this.fileData = fileData
+            this.uploading = true
+            qiniuUpload(this.fileData, this.update)
+        },
+        async update(params) {
+            this.fileData = {
+                ...this.fileData,
+                ...params
+            }
+            if (params.status === 'completed') {
+                this.$message.success('上传PDF成功')
+                try {
+                    this.loadingPng = true
+                    const res = await getPdfimg({ media_id: this.fileData.key })
+                    this.form.ppt.push(res.data)
+                    const result = []
+                    const pptTime = []
+                    res.forEach(item => {
+                        result.push({
+                            media_id: item.media_id,
+                            media_real_url: item.url
+                        })
+                        pptTime.push(pptTimeDefault)
+                    })
+                    this.pptTime = pptTime
+                    this.form.ppt = result
+                    this.activeID = result[0].media_id
+                } catch (error) {
+                    //
+                }
+                this.loadingPng = false
+            } else if (params.status === 'error') {
+                this.$message.error('PDF上传失败')
+            }
+            this.uploading = false
+        },
         loadPlayer() {
             this.$nextTick(() => {
                 loader.JS(
@@ -250,7 +314,7 @@ export default {
 
         // 绑定时间先对当前的时间进行检验，需要在前后中间，比如第一张第三张，如果是需要第二张需要在这中间
         addTime(index) {
-            if (!this.activeID) {
+            if (!this.activeID && this.activeID !== 0) {
                 this.$message.error('请先选择一张PPT')
                 return
             }
@@ -309,25 +373,6 @@ export default {
                         })
                 }
             })
-        },
-        beforeUpload(file) {
-            if (file.size >= 2 * 1024 * 1024) {
-                this.$message.error('PPT不能大于2M')
-                return false
-            }
-            return true
-        },
-        onUploadSuccess(res) {
-            if (res.code === 200) {
-                this.form.ppt.push(res.data)
-                this.$message.success('上传图片成功')
-                this.pptTime.push(pptTimeDefault)
-            } else {
-                this.$message.error(`图片上传失败：${res.msg}`)
-            }
-        },
-        onUploadError() {
-            this.$message.error('图片上传失败')
         },
         // 找到就近没有绑定时间的ppt的下标
         findNobindTimeInex(i) {
@@ -406,11 +451,18 @@ export default {
                             return list
                         })
                     }
-                    this.activeID = res.ppt[0].media_id
-                    this.activeIndex = 0
-                    this.pptTime = res.ppt.map(pptitem =>
-                        `${pptitem.start_time},${pptitem.end_time}`.split(',')
-                    )
+                    try {
+                        this.fileData = {}
+                        this.activeID = res.ppt[0].media_id
+                        this.activeIndex = 0
+                        this.pptTime = res.ppt.map(pptitem =>
+                            `${pptitem.start_time},${pptitem.end_time}`.split(
+                                ','
+                            )
+                        )
+                    } catch (error) {
+                        //
+                    }
                     this.loadPlayer()
                 })
                 .finally(() => {
@@ -436,8 +488,10 @@ export default {
 }
 .pptform {
     .tips {
+        display: inline-block;
         font-size: 12px;
         color: @color-gray;
+        line-height: 1.6;
     }
     &-btn {
         text-align: right;

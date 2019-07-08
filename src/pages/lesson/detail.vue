@@ -25,14 +25,10 @@
                 </el-table-column>
                 <el-table-column prop="name" width="150" label="目录名称">
                 </el-table-column>
-                <el-table-column
-                    prop="vedio"
-                    min-width="200"
-                    label="目录视频截图"
-                >
+                <el-table-column min-width="200" label="目录视频截图">
                     <template slot-scope="scope">
                         <img
-                            :src="scope.row.ppt"
+                            :src="scope.row.video_img_url"
                             width="100"
                             height="100"
                             alt=""
@@ -46,7 +42,10 @@
                         <el-button type="text" @click="openDialog(scope.row)"
                             >编辑</el-button
                         >
-                        <el-button type="text" @click="gotoBindppt(scope.row)"
+                        <el-button
+                            type="text"
+                            v-if="scope.row.video_media_type === 3"
+                            @click="gotoBindppt(scope.row)"
                             >绑定ppt</el-button
                         >
 
@@ -120,24 +119,6 @@ export default {
         },
         addsuccess() {
             this.fetchData()
-        },
-        beforeUpload() {
-            //
-        },
-        onUploadSuccess(res) {
-            if (res.code === 200) {
-                this.form.coverPhoto = res.data.media_real_url
-                this.form.cover = res.data.media_id
-                this.$message.success('上传图片成功')
-            } else {
-                this.$message.error(`图片上传失败：${res.msg}`)
-            }
-        },
-        onUploadError() {
-            this.$message.error('图片上传失败')
-        },
-        addCatalog() {
-            this.form.catalogList.push({})
         },
         openDialog(item) {
             this.$refs.catalogDialog.open(item)

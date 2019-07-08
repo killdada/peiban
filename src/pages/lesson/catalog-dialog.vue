@@ -38,48 +38,77 @@
                 ></el-input>
             </el-form-item>
             <el-form-item label="目录视频" prop="vedio">
-                <div class="single  upload-vedio-container">
-                    <div
-                        :title="
-                            uploadlingVideo
-                                ? '正在上传视频请稍候'
-                                : '点击这个区域可以上传视频'
-                        "
-                        class="video-preview"
-                    >
+                <el-radio-group
+                    v-model="form.upload_type"
+                    @change="changeMethod"
+                >
+                    <el-radio :label="1">直接上传</el-radio>
+                    <el-radio :label="2">从素材库选择</el-radio>
+                </el-radio-group>
+                <template v-if="form.upload_type === 1">
+                    <div class="single  upload-vedio-container">
                         <div
-                            v-if="form.vedio || currentFileObj.name"
-                            class="has-border"
-                            @click="selectFile"
-                            :class="uploadlingVideo && 'disabled'"
+                            :title="
+                                uploadlingVideo
+                                    ? '正在上传视频请稍候'
+                                    : '点击这个区域可以上传视频'
+                            "
+                            class="video-preview"
                         >
-                            <span>您选择的文件：{{ currentFileObj.name }}</span>
-                            <strong v-if="currentFileObj.percent > 0"
-                                >已上传 {{ currentFileObj.percent }}%</strong
+                            <div
+                                v-if="form.vedio || currentFileObj.name"
+                                class="has-border"
+                                @click="selectFile"
+                                :class="uploadlingVideo && 'disabled'"
                             >
+                                <span
+                                    >您选择的文件：{{
+                                        currentFileObj.name
+                                    }}</span
+                                >
+                                <strong v-if="currentFileObj.percent > 0"
+                                    >已上传
+                                    {{ currentFileObj.percent }}%</strong
+                                >
+                                <el-button
+                                    size="small"
+                                    :disabled="uploadlingVideo"
+                                    type="primary"
+                                    >点击上传</el-button
+                                >
+                            </div>
                             <el-button
                                 size="small"
-                                :disabled="uploadlingVideo"
+                                v-else
+                                @click="selectFile"
                                 type="primary"
                                 >点击上传</el-button
                             >
                         </div>
-                        <el-button
-                            size="small"
-                            v-else
-                            @click="selectFile"
-                            type="primary"
-                            >点击上传</el-button
-                        >
+                        <input
+                            type="file"
+                            id="upload"
+                            style="display: none"
+                            accept="video/*,audio/*"
+                            @change="uploadfile"
+                        />
                     </div>
-                    <input
-                        type="file"
-                        id="upload"
-                        style="display: none"
-                        accept="video/*"
-                        @change="uploadfile"
-                    />
-                </div>
+                </template>
+                <el-select
+                    v-model="form.vediobind"
+                    style="display: block;width: 300px;"
+                    v-else
+                    filterable
+                    placeholder="请选择"
+                >
+                    <el-option
+                        v-for="item in materialList"
+                        :key="item.media_id"
+                        :label="item.show_name"
+                        :value="item.media_id"
+                    >
+                    </el-option>
+                </el-select>
             </el-form-item>
             <el-form-item label="目录视频时长" prop="play_time">
                 <el-time-picker
@@ -106,18 +135,35 @@
 
 <script>
 import { addCatalog, updateCatalog, getCatalogDetail } from 'src/api/lesson'
+import { getMaterials } from 'src/api/material'
 import { qiniuUpload } from 'src/utils/qiniu'
 
 export default {
     data() {
+        const vaildVedio = (rule, value, callback) => {
+            if (this.form.upload_type === 1) {
+                if (!value) {
+                    callback(new Error('目录视频、音频不能为空'))
+                } else {
+                    callback()
+                }
+            } else if (!this.form.vediobind) {
+                callback(new Error('目录视频、音频不能为空,请绑定一个'))
+            } else {
+                callback()
+            }
+        }
         return {
             vedioData: { media_type: 3 },
             form: {
                 name: '', // 目录名称
                 alias: '', // 目录别名
                 vedio: '', // 目录视频
+                vediobind: '', // 绑定视频的值
                 vedio_url: '',
-                desc: '' // 目录描述
+                desc: '', // 目录描述
+                upload_type: 1, // 1 .自上传，2.选择
+                play_time: ''
             },
             formVisible: false,
             rules: {
@@ -132,7 +178,8 @@ export default {
                     trigger: ['blur']
                 },
                 vedio: {
-                    message: '目录视频不能为空',
+                    validator: vaildVedio,
+                    message: '',
                     required: true,
                     trigger: ['blur']
                 },
@@ -146,10 +193,22 @@ export default {
             btnloading: false,
             isEdit: false,
             uploadlingVideo: false,
-            currentFileObj: {}
+            currentFileObj: {},
+            materialList: []
         }
     },
     methods: {
+        changeMethod() {
+            this.$refs.form.clearValidate('vedio')
+        },
+        async getMaterials() {
+            try {
+                const res = await getMaterials()
+                this.materialList = res.data || []
+            } catch (error) {
+                //
+            }
+        },
         selectFile() {
             if (this.uploadlingVideo) {
                 return
@@ -185,25 +244,49 @@ export default {
             this.uploadlingVideo = true
             qiniuUpload(this.currentFileObj, this.updateFileObj)
         },
-        open(item) {
+        async open(item) {
             this.formVisible = true
             this.isEdit = !!item
             this.hasChange = false
 
+            try {
+                await this.getMaterials()
+            } catch (error) {
+                //
+            }
             if (this.isEdit) {
                 this.loading = true
                 getCatalogDetail(this.$route.params.id, item.id)
                     .then(res => {
-                        this.form = {
-                            ...res,
-                            desc: res.remark,
-                            vedio: res.video_media_id, // 目录视频
-                            vedio_url: res.video_url
+                        const result = {
+                            media_type: res.media_type,
+                            play_time: res.play_time,
+                            id: res.id,
+                            name: res.name, // 目录名称
+                            alias: res.alias, // 目录别名
+                            vedio: '', // 目录视频
+                            vediobind: '', // 绑定视频的值
+                            vedio_url: res.video_url,
+                            desc: res.remark, // 目录描述
+                            upload_type: res.upload_type // 1 .自上传，2.选择
                         }
-                        this.currentFileObj = {
-                            ...this.currentFileObj,
-                            name: res.video_media_id
+
+                        if (res.upload_type === 1) {
+                            this.currentFileObj = {
+                                name: res.video_media_id,
+                                key: res.video_media_id,
+                                media_type: res.media_type
+                            }
+                            result.vedio = res.video_media_id
+                        } else {
+                            result.vediobind = res.video_media_id
+                            this.currentFileObj = {}
                         }
+                        // 始终保留上次的ppt内容
+                        if (res.ppt && res.ppt.length) {
+                            result.ppt = res.ppt
+                        }
+                        this.form = result
                     })
                     .finally(() => {
                         this.loading = false
@@ -215,8 +298,12 @@ export default {
                     name: '', // 目录名称
                     vedio: '', // 目录视频
                     vedio_url: '',
-                    desc: '' // 目录描述
+                    vediobind: '', // 绑定视频的值
+                    desc: '', // 目录描述
+                    upload_type: 1,
+                    play_time: ''
                 }
+                this.currentFileObj = {}
             }
             this.uploadlingVideo = false
         },
@@ -224,8 +311,6 @@ export default {
             this.formVisible = false
         },
         resetForm() {
-            this.uploaderInstance && this.uploaderInstance.destroy()
-            this.uploaderInstance = ''
             this.$refs.form && this.$refs.form.resetFields()
         },
         cancel() {
@@ -238,8 +323,23 @@ export default {
                         return
                     }
                     this.btnloading = true
+                    const params = {
+                        ...this.form
+                    }
+                    if (params.upload_type === 2) {
+                        params.vedio = params.vediobind
+                        const select = this.materialList.find(
+                            item => item.media_id === params.vediobind
+                        )
+                        if (select) {
+                            params.media_type = select.media_type
+                        }
+                    } else {
+                        params.vedio = this.currentFileObj.key
+                        params.media_type = this.currentFileObj.media_type
+                    }
                     if (!this.isEdit) {
-                        addCatalog(this.$route.params.id, this.form)
+                        addCatalog(this.$route.params.id, params)
                             .then(() => {
                                 this.$message.success('添加成功')
                                 this.$emit('onsuccess')
@@ -252,11 +352,7 @@ export default {
                                 this.btnloading = false
                             })
                     } else {
-                        updateCatalog(
-                            this.$route.params.id,
-                            this.form.id,
-                            this.form
-                        )
+                        updateCatalog(this.$route.params.id, params.id, params)
                             .then(() => {
                                 this.$message.success('编辑成功')
                                 this.formVisible = false

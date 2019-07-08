@@ -4,6 +4,7 @@
             :action="action"
             :accept="accept"
             :name="image"
+            :http-request="httpRequest"
             class="uploader"
             :style="style"
             :data="data"
@@ -93,6 +94,7 @@ export default {
             default: true
         },
         beforeUpload: Function,
+        httpRequest: Function,
         disabled: {
             type: Boolean,
             default: false

@@ -68,3 +68,8 @@ export function delCatalog(lessonID, catalogID) {
 export function getPolicy() {
     return xhttp.get(extendUrl('/oss/get-policy'))
 }
+
+// 上传PDF以后保存接口，获取png图片列表
+export function getPdfimg(params) {
+    return xhttp.post(extendUrl('/pdf2png'), params)
+}

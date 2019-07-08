@@ -1,13 +1,24 @@
 <template>
     <div class="page-material-manage">
-        <el-button
-            type="primary"
-            class="page-material-manage__add"
-            @click="openDialog"
-            size="medium"
-        >
-            <a style="color: #fff">上传素材</a>
-        </el-button>
+        <header>
+            <el-input
+                placeholder="请输入素材标题"
+                suffix-icon="el-icon-search"
+                @keyup.enter.native="fetchData"
+                size="medium"
+                v-model.trim="key"
+            >
+            </el-input>
+            <el-button
+                type="primary"
+                class="page-material-manage__add"
+                @click="openDialog"
+                size="medium"
+            >
+                <a style="color: #fff">上传素材</a>
+            </el-button>
+        </header>
+
         <el-table :data="data" v-loading="loading.list">
             <el-table-column
                 type="index"
@@ -17,23 +28,23 @@
                 width="70"
             >
             </el-table-column>
-            <el-table-column prop="username" min-width="200" label="视频标题">
+            <el-table-column prop="show_name" min-width="200" label="素材标题">
             </el-table-column>
-            <el-table-column prop="username" min-width="200" label="素材类型">
+            <el-table-column min-width="200" label="素材类型">
+                <template slot-scope="{ row }">
+                    {{ row.media_type === 3 ? '视频' : '音频' }}
+                </template>
             </el-table-column>
-            <el-table-column prop="username" min-width="200" label="创建时间">
+            <el-table-column prop="created_at" min-width="200" label="创建时间">
             </el-table-column>
             <el-table-column label="操作" min-width="150">
                 <template slot-scope="scope">
                     <el-button type="text" @click="openEdit(scope.row)"
                         >编辑</el-button
                     >
-                    <el-button
-                        type="text"
+                    <!-- <el-button type="text"
                         class="delete"
-                        @click="deleteMaterial(scope.row.id)"
-                        >删除</el-button
-                    >
+                        @click="deleteMaterial(scope.row.id)">删除</el-button> -->
                 </template>
             </el-table-column>
         </el-table>
@@ -108,15 +119,27 @@
                     </el-table-column>
                 </el-table>
                 <div class="batch-btn" v-if="fileList.length">
-                    <el-button size="small" @click="fileActionAll"
-                        >全部开始上传</el-button
-                    >
-                    <el-button size="small" @click="fileActionAll('pause')"
-                        >全部暂停上传</el-button
-                    >
-                    <el-button size="small" @click="fileActionAll"
-                        >全部继续上传</el-button
-                    >
+                    <div>
+                        <el-button size="small" @click="fileActionAll"
+                            >全部开始上传</el-button
+                        >
+                        <el-button size="small" @click="fileActionAll('pause')"
+                            >全部暂停上传</el-button
+                        >
+                        <el-button size="small" @click="fileActionAll"
+                            >全部继续上传</el-button
+                        >
+                    </div>
+                    <div>
+                        <el-button
+                            size="medium"
+                            type="primary"
+                            class="save-btn"
+                            :loading="loading.saveMaterial"
+                            @click="saveMaterial"
+                            >保存</el-button
+                        >
+                    </div>
                 </div>
             </div>
         </el-dialog>
@@ -131,7 +154,7 @@
                 <el-form-item label="素材标题">
                     <el-input
                         style="width: 300px;"
-                        v-model="form.username"
+                        v-model="form.name"
                     ></el-input>
                 </el-form-item>
             </el-form>
@@ -145,7 +168,7 @@
 </template>
 
 <script>
-import { getMemberList } from 'src/api/member'
+import { saveMaterial, getMaterials, updateMaterial } from 'src/api/material'
 import { qiniuUpload, pauseUpload } from 'src/utils/qiniu'
 
 export default {
@@ -160,13 +183,50 @@ export default {
             loading: {
                 list: false,
                 editFormBtn: false,
-                addMaterialBtn: false
+                addMaterialBtn: false,
+                saveMaterial: false
             },
-            fileList: []
+            fileList: [],
+            key: ''
         }
     },
     components: {},
     methods: {
+        async saveMaterial() {
+            if (this.loading.saveMaterial) {
+                return
+            }
+            this.loading.saveMaterial = true
+            try {
+                const list = []
+                const newFileList = []
+                this.fileList.forEach(item => {
+                    if (item.status === 'completed') {
+                        list.push({
+                            media_type: item.media_type,
+                            show_name: item.name,
+                            media_id: item.key
+                        })
+                    } else {
+                        // 后续只显示没有保存的文件
+                        newFileList.push(item)
+                    }
+                })
+                if (list.length) {
+                    await saveMaterial({
+                        list
+                    })
+                    this.$message.success('已经上传完成的视频保存成功')
+                    this.fileList = newFileList
+                    this.fetchData()
+                } else {
+                    this.$message.info('没有一个素材上传成功，无法保存')
+                }
+            } catch (error) {
+                //
+            }
+            this.loading.saveMaterial = false
+        },
         getBtnText(status) {
             let text = '开始上传'
             switch (status) {
@@ -248,17 +308,28 @@ export default {
             this.showDialog = true
         },
         openEdit(row) {
-            this.form = row
+            this.form = { name: row.show_name, id: row.id }
             this.showEditDialog = true
         },
-        saveEdit() {
-            if (!this.form.username) {
+        async saveEdit() {
+            if (!this.form.name) {
                 return this.$message.info('标题不能为空')
             }
             if (this.loading.editFormBtn) {
                 return
             }
             this.loading.editFormBtn = true
+            try {
+                await updateMaterial(this.form.id, {
+                    show_name: this.form.name
+                })
+                this.$message.success('修改素材标题成功')
+                this.showEditDialog = false
+                this.fetchData()
+            } catch (error) {
+                this.$message.error(error.msg || '修改素材标题失败')
+            }
+            this.loading.editFormBtn = false
         },
         deleteMaterial() {
             this.$confirm('此操作将永久删除该素材, 是否继续?', '提示', {
@@ -287,12 +358,14 @@ export default {
             }
             this.loading.list = true
 
-            getMemberList({
-                page: page || this.page || 1
+            getMaterials({
+                page: page || this.page || 1,
+                media_type: '',
+                show_name: this.key || ''
             })
                 .then(res => {
-                    this.data = res.list
-                    this.total = res.sum
+                    this.data = res.data
+                    this.total = res.total
                 })
                 .catch(e => {
                     this.$message.error(e.message)
@@ -326,6 +399,10 @@ export default {
         .batch-btn {
             margin-top: 20px;
             text-align: right;
+            .save-btn {
+                margin-top: 20px;
+                min-width: 200px;
+            }
         }
     }
 }
@@ -358,10 +435,18 @@ export default {
 }
 .page-material-manage {
     background-color: #fff;
-    padding: 20px;
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .el-input {
+            width: 400px;
+            margin-left: 20px;
+        }
+    }
     &__add {
         float: right;
-        margin-bottom: 20px;
+        margin: 20px;
     }
     .delete {
         color: @color-red;

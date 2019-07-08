@@ -18,15 +18,15 @@
                 <li slot="reference" style="width:auto;min-width:120px">
                     <span>
                         {{ account }}
-                        <i class="el-icon-arrow-down el-icon--right"></i>
+                        <!-- <i class="el-icon-arrow-down el-icon--right"></i> -->
                     </span>
                 </li>
-                <ul
+                <!-- <ul
                     @mouseover="menuStatus.hover = true"
                     @mouseleave="menuStatus.hover = false"
                 >
                     <li class="btn-danger" @click="logout">退出账号</li>
-                </ul>
+                </ul> -->
             </dropdown-menu>
         </ul>
     </div>
