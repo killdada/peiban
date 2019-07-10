@@ -9,7 +9,7 @@ export function getMemberList(params) {
     return xhttp.get(extendUrl('/user'), { params })
 }
 
-export const reportLink = `${baseUrl}/user/export`
+export const reportLink = extendUrl(`${baseUrl}/user/export`)
 
 // 获取某个人员的学习记录列表
 export function getMemberStudyList(name, params) {
