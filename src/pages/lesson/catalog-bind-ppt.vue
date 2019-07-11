@@ -17,7 +17,7 @@
             >
                 <el-form-item prop="ppt">
                     <span slot="label" class="tips">
-                        上传pdf以后会生成对应的多张图片。然后为每张图片绑定时间段。
+                        上传pdf以后会生成对应的多张图片。然后按顺序为每张图片绑定时间段。
                     </span>
                     <div>
                         <el-button
@@ -60,17 +60,34 @@
                                 <div class="el-carouser-index">
                                     {{ index + 1 }}
                                 </div>
-                                <i
-                                    class="el-icon-circle-close delete"
-                                    @click.stop.prevent="delImg(img, index)"
-                                ></i>
+                                <div class="action">
+                                    <i
+                                        class="el-icon-download download"
+                                        title="下载原图"
+                                        @click="
+                                            download(
+                                                img.media_real_url,
+                                                '',
+                                                '_blank'
+                                            )
+                                        "
+                                    ></i>
+                                    <i
+                                        class="el-icon-zoom-in zoom"
+                                        title="查看图片大图"
+                                        @click.stop.prevent="
+                                            openImgDialog(img.media_real_url)
+                                        "
+                                    ></i>
+                                    <i
+                                        class="el-icon-delete delete"
+                                        title="删除该图片可能会导致时间范围断层，需要重新从开头确认下每张图片的时间"
+                                        @click.stop.prevent="delImg(img, index)"
+                                    ></i>
+                                </div>
                             </el-carousel-item>
                         </el-carousel>
-                        <div
-                            v-for="(item, index) in form.ppt"
-                            style="text-align: center"
-                            :key="index"
-                        >
+                        <div v-for="(item, index) in form.ppt" :key="index">
                             <div v-if="activeID === item.media_id">
                                 <el-time-picker
                                     is-range
@@ -85,7 +102,7 @@
                                 >
                                 </el-time-picker>
                                 <el-button
-                                    title="对选中的ppt选择时间范围后提交"
+                                    title="对当前的图片选择时间范围后提交"
                                     @click="addTime(index)"
                                     size="medium"
                                     >提交</el-button
@@ -105,6 +122,15 @@
                 >
             </div>
         </div>
+        <el-dialog
+            :visible.sync="showImgDialog"
+            class="preview-dialog"
+            width="80%"
+            title="大图"
+            top="10vh"
+        >
+            <img :src="imgUrl" alt="" />
+        </el-dialog>
     </div>
 </template>
 
@@ -114,11 +140,13 @@ import { updateCatalog, getCatalogDetail, getPdfimg } from 'src/api/lesson'
 import { uploadImg } from 'src/api/common'
 import { getItem } from 'src/utils/localStorageUtils'
 import { qiniuUpload } from 'src/utils/qiniu'
+import download from 'src/utils/download'
 
 const pptTimeDefault = ['00:00:00', '00:00:00']
 
 export default {
     name: 'catalogBindPpt',
+    mixins: [download],
     data() {
         const vaildppt = (rule, value, callback) => {
             if (value.length) {
@@ -138,7 +166,7 @@ export default {
                     callback()
                 }
             } else {
-                callback(new Error('请至少上传一张ppt图片'))
+                callback(new Error('请至少保证有一张图片'))
             }
         }
         return {
@@ -162,7 +190,9 @@ export default {
             lessonID: '',
             fileData: {},
             uploading: false,
-            loadingPng: false
+            loadingPng: false,
+            showImgDialog: false,
+            imgUrl: ''
         }
     },
     computed: {
@@ -171,6 +201,10 @@ export default {
         }
     },
     methods: {
+        openImgDialog(img) {
+            this.imgUrl = img
+            this.showImgDialog = true
+        },
         changeActive(next) {
             this.selectImg(this.form.ppt[next], next)
         },
@@ -244,9 +278,6 @@ export default {
                 container,
                 autoplay: true
             })
-        },
-        isPng(src) {
-            return /^https:\/\/.*?(gif|png|jpg)$/.test(src)
         },
         // 计算时间秒
         countSec(time) {
@@ -356,7 +387,7 @@ export default {
                 if (valid) {
                     // 上面检验的都是表单项，下面接着检验时间范围是否合格
                     if (!this.validAllImg()) {
-                        this.$message.error('部分PPT时间范围冲突，请检查')
+                        this.$message.error('部分图片时间范围冲突，请检查')
                         return
                     }
                     if (this.btnloading) {
@@ -390,7 +421,7 @@ export default {
 
             if (i > -1) {
                 this.$message.info(
-                    '前面的ppt还没有绑定时间，请按顺序绑定ppt时间，正在为你选择前面的图片'
+                    '前面的图片还没有绑定时间，请按顺序绑定图片时间，正在为你选择前面的图片'
                 )
                 this.$refs.carousel.prev()
                 return
@@ -424,10 +455,14 @@ export default {
                 item => item.media_id !== img.media_id
             )
             this.pptTime = this.pptTime.filter((item, i) => i !== index)
+            if (!this.form.ppt.length) {
+                this.$refs.form.validateField('ppt')
+                return // 图片删光了后续不需要操作了
+            }
             if (index !== this.form.ppt.length - 1 && img.start_time) {
                 // 绑定过时间的，并且不是最后一张，删除的时候可能会导致前后PPT时间有断层，这里给出提示
                 this.$message.info(
-                    '该操作可能会导致PPT时间范围断层，请重头确认每张PPT的时间'
+                    '该操作可能会导致图片时间范围断层，请重头确认每张图片的时间'
                 )
                 // 删除的是第一个的话，需要手动触发
                 if (index === 0) {
@@ -478,13 +513,17 @@ export default {
     },
     created() {
         this.fetchData()
-    },
-    mounted() {}
+    }
 }
 </script>
 
 <style lang="less" scoped>
 @import '~assets/less/var.less';
+
+.preview-dialog /deep/ .el-dialog {
+    overflow-x: hidden;
+    text-align: center;
+}
 
 .page-catalog-bind-ppt {
     width: 680px;
@@ -510,11 +549,9 @@ export default {
     }
     /deep/ .el-form-item__error {
         right: 0;
-        width: 430px;
-        text-align: center;
     }
     /deep/ .el-carousel {
-        width: 512px;
+        // width: 512px;
         margin: 10px auto 20px;
         .el-carouser-index {
             position: absolute;
@@ -528,16 +565,24 @@ export default {
             border-radius: 50%;
             color: #fff;
             background-color: red;
-            // background-color: rgba(255, 255, 255, 0.5);
             text-align: center;
             font-size: 14px;
         }
-        .delete {
+        .delete,
+        .zoom,
+        .download {
             position: absolute;
             right: 0;
             top: 0;
             font-size: 20px;
             cursor: pointer;
+            z-index: 100;
+        }
+        .download {
+            top: 60px;
+        }
+        .zoom {
+            top: 30px;
         }
     }
     /deep/ .el-carousel__item {
@@ -551,69 +596,5 @@ export default {
     width: 640px;
     height: 480px;
     margin: 20px auto;
-}
-.imglist-item {
-    border-radius: 6px;
-    width: 148px;
-    height: 148px;
-    cursor: pointer;
-    line-height: 146px;
-    display: inline-block;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    position: relative;
-    &.is-error {
-        border: 4px solid @color-red;
-    }
-    &.noimg {
-        border: 1px solid @border-color;
-    }
-    .plus {
-        font-size: 30px;
-    }
-    .delete {
-        position: absolute;
-        right: -5px;
-        top: -5px;
-        font-size: 20px;
-        color: @color-red;
-        display: none;
-    }
-    &:hover .delete {
-        display: inline-block;
-        z-index: 100;
-    }
-    img {
-        width: 100%;
-        height: 100%;
-    }
-    .mask {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        background: rgba(0, 0, 0, 0.3);
-    }
-    .check {
-        position: absolute;
-        width: 30px;
-        height: 30px;
-        color: #fff;
-        right: 0;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        margin: auto;
-        font-size: 30px;
-        z-index: 100;
-    }
-}
-.imglist-container {
-    display: inline-block;
-    .el-upload .drag-container {
-        display: flex;
-        flex-wrap: wrap;
-    }
 }
 </style>
