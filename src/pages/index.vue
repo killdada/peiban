@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { getItem } from 'src/utils/localStorageUtils'
+import { localStorageUtils } from 'appcloud-component'
 
 const menus = [
     {
@@ -94,7 +94,7 @@ export default {
                     courseName = '课程名',
                     catalogName = '目录名',
                     lessonID
-                } = getItem('peibanData')
+                } = localStorageUtils.getItem('peibanData')
                 return [
                     {
                         name: '课程列表',

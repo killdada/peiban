@@ -4,7 +4,8 @@ import 'src/utils/polyfill'
 import store from 'src/store'
 import cookie from 'js-cookie'
 import BaseComponents from 'components'
-import 'src/assets/less/base.less'
+import AppcloudComponents from 'appcloud-component'
+// import 'src/assets/less/base.less'
 import 'src/assets/less/common.less'
 import 'element-ui/lib/theme-chalk/index.css'
 
@@ -13,6 +14,7 @@ import router from './router'
 
 Vue.use(ElementUI)
 Vue.use(BaseComponents)
+Vue.use(AppcloudComponents)
 Vue.config.productionTip = false
 
 router.beforeEach((to, from, next) => {

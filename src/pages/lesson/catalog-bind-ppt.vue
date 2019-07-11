@@ -135,12 +135,10 @@
 </template>
 
 <script>
-import loader from 'src/utils/loader'
 import { updateCatalog, getCatalogDetail, getPdfimg } from 'src/api/lesson'
 import { uploadImg } from 'src/api/common'
-import { getItem } from 'src/utils/localStorageUtils'
 import { qiniuUpload } from 'src/utils/qiniu'
-import download from 'src/utils/download'
+import { download, loader, localStorageUtils } from 'appcloud-component'
 
 const pptTimeDefault = ['00:00:00', '00:00:00']
 
@@ -477,7 +475,7 @@ export default {
         },
         fetchData() {
             if (this.loading) return
-            const { lessonID } = getItem('peibanData')
+            const { lessonID } = localStorageUtils.getItem('peibanData')
             this.lessonID = lessonID
             this.loading = true
             getCatalogDetail(lessonID, this.catalogId)

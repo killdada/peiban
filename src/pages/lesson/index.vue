@@ -86,31 +86,6 @@ export default {
         background-color: #fff;
     }
     &-main {
-        height: 100%;
     }
 }
-// .page-app >.el-main {
-//     padding: 0;
-//     width: 1200px;
-//     margin: 30px auto 20px;
-//     flex-basis: 100%;
-//     height:calc(~'100% - 100px');
-//     overflow: auto;
-//     border: 1px solid #E6EAEE;
-//     border-radius: 4px;
-// }
-// .page-app {
-//     &-header{
-//         background-color: #fff;
-//         line-height: 70px;
-//         .inner{
-//             width: 1200px;
-//             margin: 0 auto;
-//             padding-left: 20px;
-//             font-size: 18px;
-//             color: #354052;
-//             font-weight:bold;
-//         }
-//     }
-// }
 </style>

@@ -78,7 +78,7 @@
 <script>
 import { uploadImg } from 'src/api/common'
 import { getCatalogList, delCatalog } from 'src/api/lesson'
-import { getItem, setItem } from 'src/utils/localStorageUtils'
+import { localStorageUtils } from 'appcloud-component'
 import catalogDialog from './catalog-dialog'
 import lessonForm from './lesson-form'
 
@@ -113,8 +113,8 @@ export default {
     },
     methods: {
         gotoBindppt({ id, name }) {
-            const data = getItem('peibanData', {})
-            setItem('peibanData', {
+            const data = localStorageUtils.getItem('peibanData', {})
+            localStorageUtils.setItem('peibanData', {
                 ...data,
                 lessonID: this.lessonID,
                 courseName: this.$refs.lessonForm.form.name,

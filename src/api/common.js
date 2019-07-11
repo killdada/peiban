@@ -7,15 +7,15 @@ const baseURL = getBaseURL()
 export const uploadImg = extendUrl(`${baseURL}/college/upload`)
 
 export function uploadFile(params) {
-    return xhttp.post(extendUrl('/college/upload'), params)
+    return xhttp.post('/college/upload', params)
 }
 
 // 获取所有的课程
 export function getAllLesson() {
-    return xhttp.get(extendUrl('/lesson/all'))
+    return xhttp.get('/lesson/all')
 }
 
 // 获取上传的token
 export function getQiniuToken() {
-    return xhttp.get(extendUrl('/qiniu_token'))
+    return xhttp.get('/qiniu_token')
 }

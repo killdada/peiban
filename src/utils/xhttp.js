@@ -1,7 +1,7 @@
 import axios from 'axios'
 import cookie from 'js-cookie'
 import getBaseURL from 'src/const/baseURL'
-import { bus } from './event'
+import { bus } from 'appcloud-component'
 
 const baseURL = getBaseURL()
 
@@ -18,6 +18,12 @@ xhttp.interceptors.request.use(config => {
         }
         requestMap[config.url] = axios.CancelToken.source()
         config.cancelToken = requestMap[config.url].token
+    }
+    const token = cookie.get('token') || ''
+    if (token) {
+        config.url = `${config.url}${
+            config.url.indexOf('?') !== -1 ? '&' : '?'
+        }token=${token}`
     }
     return config
 })
@@ -62,8 +68,8 @@ xhttp.interceptors.response.use(
             error.response.status === 400 ||
             error.response.status === 401
         ) {
-            cookie.remove('token')
-            location.reload()
+            // cookie.remove('token')
+            // location.reload()
         }
         bus.$emit(String(error.response.status))
         return Promise.reject(error)

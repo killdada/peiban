@@ -36,7 +36,11 @@
             <el-table-column prop="topic" label="练习主题"> </el-table-column>
             <el-table-column prop="practice_num" label="练习回复数">
             </el-table-column>
-            <el-table-column prop="lastest_practice_reply" label="最新练习回复">
+            <el-table-column
+                prop="lastest_practice_reply"
+                show-overflow-tooltip
+                label="最新练习回复"
+            >
             </el-table-column>
             <el-table-column label="操作" min-width="150">
                 <template slot-scope="scope">
@@ -417,7 +421,6 @@ export default {
     }
 }
 .page-Practice-list {
-    height: 100%;
     background-color: #fff;
     header {
         padding: 15px 20px;

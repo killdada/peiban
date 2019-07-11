@@ -30,9 +30,14 @@
             </el-table-column>
             <el-table-column prop="show_name" min-width="200" label="素材标题">
             </el-table-column>
-            <el-table-column min-width="200" label="素材类型">
+            <el-table-column label="素材类型">
                 <template slot-scope="{ row }">
                     {{ row.media_type === 3 ? '视频' : '音频' }}
+                </template>
+            </el-table-column>
+            <el-table-column min-width="200" label="素材大小">
+                <template slot-scope="{ row }">
+                    {{ Math.ceil(row.size / 1024 / 1024) }} MB
                 </template>
             </el-table-column>
             <el-table-column prop="created_at" min-width="200" label="创建时间">

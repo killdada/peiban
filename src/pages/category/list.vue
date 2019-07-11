@@ -353,7 +353,6 @@ export default {
     }
 }
 .page-Category-list {
-    height: 100%;
     background-color: #fff;
     .tips {
         color: @color-gray;

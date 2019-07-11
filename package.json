@@ -23,7 +23,8 @@
         "vue": "^2.6.10",
         "vue-router": "^3.0.3",
         "vuedraggable": "^2.21.0",
-        "vuex": "^3.0.1"
+        "vuex": "^3.0.1",
+        "appcloud-component": "git+ssh://git@git.mysoft.com.cn:b2c-platform/appcloud-component.git"
     },
     "devDependencies": {
         "@vue/cli-plugin-babel": "^3.7.0",
