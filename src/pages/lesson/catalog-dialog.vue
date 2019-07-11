@@ -37,7 +37,7 @@
                     v-model.trim="form.desc"
                 ></el-input>
             </el-form-item>
-            <el-form-item label="目录视频" prop="vedio">
+            <el-form-item label="目录素材" prop="vedio">
                 <el-radio-group
                     v-model="form.upload_type"
                     @change="changeMethod"
@@ -50,8 +50,8 @@
                         <div
                             :title="
                                 uploadlingVideo
-                                    ? '正在上传视频请稍候'
-                                    : '点击这个区域可以上传视频'
+                                    ? '正在上传素材请稍候'
+                                    : '点击这个区域可以上传素材'
                             "
                             class="video-preview"
                         >
@@ -96,6 +96,7 @@
                 </template>
                 <el-select
                     v-model="form.vediobind"
+                    @change="changeSelectMaterial"
                     style="display: block;width: 300px;"
                     v-else
                     filterable
@@ -110,7 +111,7 @@
                     </el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="目录视频时长" prop="play_time">
+            <el-form-item label="目录素材时长" prop="play_time">
                 <el-time-picker
                     v-model="form.play_time"
                     value-format="HH:mm:ss"
@@ -184,7 +185,7 @@ export default {
                     trigger: ['blur']
                 },
                 play_time: {
-                    message: '目录视频时长不能为空',
+                    message: '目录素材时长不能为空',
                     required: true,
                     trigger: ['blur']
                 }
@@ -198,6 +199,10 @@ export default {
         }
     },
     methods: {
+        changeSelectMaterial(val) {
+            const item = this.materialList.find(item => item.media_id === val)
+            item && this.getMaterialTimes(item.media_url)
+        },
         changeMethod() {
             this.$refs.form.clearValidate('vedio')
         },
@@ -215,6 +220,31 @@ export default {
             }
             document.getElementById('upload').click()
         },
+        addzero(t) {
+            return t >= 10 ? t : `0${t}`
+        },
+        forMatTime(time) {
+            const h = parseInt((time / 3600) % 60, 10)
+            const m = parseInt((time / 60) % 60, 10)
+            const s = parseInt(time % 60, 10)
+            return `${this.addzero(h)}:${this.addzero(m)}:${this.addzero(s)}`
+        },
+        getMaterialTimes(audioUrl) {
+            let url = audioUrl
+            if (!audioUrl) {
+                const obj_file = document.getElementById('upload')
+                const content = obj_file.files[0]
+                //获取录音时长
+                url = URL.createObjectURL(content)
+            }
+            //经测试，发现audio也可获取视频的时长
+            const audioElement = new Audio(url)
+            let duration
+            audioElement.addEventListener('loadedmetadata', () => {
+                duration = audioElement.duration
+                this.$set(this.form, 'play_time', this.forMatTime(duration))
+            })
+        },
         updateFileObj(params, row) {
             this.currentFileObj = {
                 ...this.currentFileObj,
@@ -225,8 +255,9 @@ export default {
                 if (params.status === 'error') {
                     this.$message.error('上传失败！')
                 } else if (params.status === 'completed') {
-                    this.$message.success('视频上传成功')
+                    this.$message.success('素材上传成功')
                     this.form.vedio = row.name
+                    this.getMaterialTimes()
                 }
                 this.uploadlingVideo = false
             }

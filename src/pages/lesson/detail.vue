@@ -25,7 +25,7 @@
                 </el-table-column>
                 <el-table-column prop="name" width="150" label="目录名称">
                 </el-table-column>
-                <el-table-column min-width="200" label="目录视频截图">
+                <el-table-column min-width="200" label="目录素材截图">
                     <template slot-scope="scope">
                         <img
                             :src="scope.row.video_img_url"
@@ -33,6 +33,11 @@
                             height="100"
                             alt=""
                         />
+                    </template>
+                </el-table-column>
+                <el-table-column label="类型">
+                    <template slot-scope="scope">
+                        {{ scope.row.video_media_type === 3 ? '视频' : '音频' }}
                     </template>
                 </el-table-column>
                 <el-table-column prop="desc" min-width="200" label="目录描述">

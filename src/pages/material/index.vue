@@ -60,7 +60,7 @@
             :visible.sync="showDialog"
         >
             <div class="upload-dialog__tips">
-                并发最多同时上传3个素材，单个素材不超过5G
+                单个素材最好不超过5G
             </div>
             <div class="upload-dialog__content">
                 <div id="uploadvideo-container">
@@ -113,6 +113,11 @@
                                 >
                                 <el-button v-else size="small"
                                     >已完成</el-button
+                                >
+                                <el-button
+                                    @click="deleteFileItem(row)"
+                                    size="small"
+                                    >删除</el-button
                                 >
                             </div>
                         </template>
@@ -192,6 +197,16 @@ export default {
     },
     components: {},
     methods: {
+        deleteFileItem(row) {
+            const actualIndex = this.fileList.findIndex(
+                item => item.index === row.index
+            )
+            if (actualIndex !== -1) {
+                // 先暂停上传，再删除文件
+                this.pauseUpload(row)
+                this.$delete(this.fileList, actualIndex)
+            }
+        },
         async saveMaterial() {
             if (this.loading.saveMaterial) {
                 return
@@ -246,12 +261,17 @@ export default {
             }
             return text
         },
+        // 如果有删除某个项的话，那么就不能直接用row里面最开始注入的index了，而应该先找到这个index
         updateFileItem(params, row) {
-            const { index } = row
-            this.$set(this.fileList, index, {
-                ...this.fileList[index],
-                ...params
-            })
+            const actualIndex = this.fileList.findIndex(
+                item => item.index === row.index
+            )
+            if (actualIndex !== -1) {
+                this.$set(this.fileList, actualIndex, {
+                    ...this.fileList[actualIndex],
+                    ...params
+                })
+            }
         },
         pauseUpload(row) {
             pauseUpload(row, this.updateFileItem)

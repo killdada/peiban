@@ -17,8 +17,7 @@
             >
                 <el-form-item prop="ppt">
                     <span slot="label" class="tips">
-                        上传pdf以后会生成对应的多张ppt图片。然后为每张图片绑定时间段。
-                        先选中图片，然后为图片选择时间段提交绑定，选中的图片是白色的勾，图片未绑定时间段，边框颜色是红色的
+                        上传pdf以后会生成对应的多张图片。然后为每张图片绑定时间段。
                     </span>
                     <div>
                         <el-button
@@ -39,42 +38,39 @@
                             @change="uploadfile"
                         />
                     </div>
-
                     <template v-if="form.ppt.length">
-                        <draggable
-                            v-model="form.ppt"
-                            class="drag-container"
-                            @end="dragEnd"
-                            :options="{ draggable: '.draggable-item' }"
+                        <el-carousel
+                            :autoplay="false"
+                            ref="carousel"
+                            trigger="click"
+                            height="384px"
+                            indicator-position="none"
+                            @change="changeActive"
+                            arrow="always"
                         >
-                            <div
+                            <el-carousel-item
                                 v-for="(img, index) in form.ppt"
-                                class="imglist-item draggable-item"
-                                :class="
-                                    error.filter(e => e === index + 1).length &&
-                                        'is-error'
-                                "
-                                @click.stop.prevent="selectImg(img, index)"
-                                :key="img.id"
+                                :style="{
+                                    backgroundImage: `url(${
+                                        img.media_real_url
+                                    })`
+                                }"
+                                :key="index"
                             >
-                                <img :src="img.media_real_url" alt="" />
+                                <div class="el-carouser-index">
+                                    {{ index + 1 }}
+                                </div>
                                 <i
                                     class="el-icon-circle-close delete"
                                     @click.stop.prevent="delImg(img, index)"
                                 ></i>
-                                <div v-if="activeID === img.media_id">
-                                    <div class="mask"></div>
-                                    <i class="el-icon-check check"></i>
-                                </div>
-                            </div>
-                        </draggable>
-                    </template>
-
-                    <div
-                        style="margin-top: 10px;position: relative;z-index: 10"
-                        v-if="form.ppt.length"
-                    >
-                        <div v-for="(item, index) in form.ppt" :key="index">
+                            </el-carousel-item>
+                        </el-carousel>
+                        <div
+                            v-for="(item, index) in form.ppt"
+                            style="text-align: center"
+                            :key="index"
+                        >
                             <div v-if="activeID === item.media_id">
                                 <el-time-picker
                                     is-range
@@ -84,6 +80,7 @@
                                     start-placeholder="开始时间"
                                     end-placeholder="结束时间"
                                     value-format="HH:mm:ss"
+                                    :clearable="false"
                                     placeholder="选择时间范围"
                                 >
                                 </el-time-picker>
@@ -95,7 +92,7 @@
                                 >
                             </div>
                         </div>
-                    </div>
+                    </template>
                 </el-form-item>
             </el-form>
             <div class="pptform-btn">
@@ -116,16 +113,12 @@ import loader from 'src/utils/loader'
 import { updateCatalog, getCatalogDetail, getPdfimg } from 'src/api/lesson'
 import { uploadImg } from 'src/api/common'
 import { getItem } from 'src/utils/localStorageUtils'
-import draggable from 'vuedraggable'
 import { qiniuUpload } from 'src/utils/qiniu'
 
 const pptTimeDefault = ['00:00:00', '00:00:00']
 
 export default {
     name: 'catalogBindPpt',
-    components: {
-        draggable
-    },
     data() {
         const vaildppt = (rule, value, callback) => {
             if (value.length) {
@@ -178,6 +171,9 @@ export default {
         }
     },
     methods: {
+        changeActive(next) {
+            this.selectImg(this.form.ppt[next], next)
+        },
         selectFile() {
             if (this.uploadlingVideo) {
                 return
@@ -220,6 +216,7 @@ export default {
                     this.pptTime = pptTime
                     this.form.ppt = result
                     this.activeID = result[0].media_id
+                    this.$refs.carousel.setActiveItem(0)
                 } catch (error) {
                     //
                 }
@@ -254,7 +251,11 @@ export default {
         // 计算时间秒
         countSec(time) {
             const arr = time.split(':')
-            return arr[0] * 3600 + arr[1] * 60 + arr[2]
+            return (
+                parseInt(arr[0], 10) * 3600 +
+                parseInt(arr[1], 10) * 60 +
+                parseInt(arr[2], 10)
+            )
         },
         nextVaild(index) {
             const next = index + 1
@@ -265,7 +266,7 @@ export default {
                     this.countSec(ppt[index].end_time)
             ) {
                 // 选择的结束时间超过了下一个的开始时间
-                return '当前选择的时间和下一张PPT时间冲突'
+                return '当前选择的时间和下一张图片时间冲突'
             }
             return false
         },
@@ -279,11 +280,10 @@ export default {
                     this.countSec(ppt[index].start_time)
             ) {
                 // 选择的结束时间超过了下一个的开始时间
-                return '当前选择的时间和上一张PPT时间冲突'
+                return '当前选择的时间和上一张图片时间冲突'
             }
             return false
         },
-
         vaild(index) {
             let result1 = true
             if (this.form.ppt.length <= 1) {
@@ -305,7 +305,7 @@ export default {
             } else {
                 const result = this.preVaild(index) || this.nextVaild(index)
                 if (result) {
-                    this.$message.error('当前选择的时间和相邻的PPT冲突')
+                    this.$message.error('当前选择的时间和相邻的图片冲突')
                     result1 = false
                 }
             }
@@ -315,12 +315,12 @@ export default {
         // 绑定时间先对当前的时间进行检验，需要在前后中间，比如第一张第三张，如果是需要第二张需要在这中间
         addTime(index) {
             if (!this.activeID && this.activeID !== 0) {
-                this.$message.error('请先选择一张PPT')
+                this.$message.error('请先选择一张图片')
                 return
             }
 
             if (this.pptTime[index][0] === this.pptTime[index][1]) {
-                this.$message.error('PPT开始时间和结束时间不能相等')
+                this.$message.error('图片开始时间和结束时间不能相等')
                 return
             }
 
@@ -334,7 +334,11 @@ export default {
             this.$refs.form.validateField('ppt')
 
             // 给出错误的提示，但不阻止修改
-            this.vaild(index)
+            const result = this.vaild(index)
+            if (result) {
+                // 检验通过，自动选择下一张图片
+                this.$refs.carousel.next()
+            }
         },
         validAllImg() {
             let result = true
@@ -383,11 +387,12 @@ export default {
         selectImg(img, index) {
             // 因为现在需要的是按顺序去设置绑定时间，所有如果选择了后面的图片，然后前面的图片有没设置的需要给出提示
             const i = this.findNobindTimeInex(index)
+
             if (i > -1) {
                 this.$message.info(
                     '前面的ppt还没有绑定时间，请按顺序绑定ppt时间，正在为你选择前面的图片'
                 )
-                this.selectImg(this.form.ppt[i], i)
+                this.$refs.carousel.prev()
                 return
             }
 
@@ -414,13 +419,6 @@ export default {
             this.activeID = img.media_id
             this.activeIndex = index
         },
-        // 拖动图片都需要提示
-        dragEnd() {
-            this.$message.info(
-                '该操作可能会导致该PPT和其他时间范围冲突，请重头确认每张PPT的时间'
-            )
-            this.selectImg(this.form.ppt[0], 0)
-        },
         delImg(img, index) {
             this.form.ppt = this.form.ppt.filter(
                 item => item.media_id !== img.media_id
@@ -431,7 +429,15 @@ export default {
                 this.$message.info(
                     '该操作可能会导致PPT时间范围断层，请重头确认每张PPT的时间'
                 )
+                // 删除的是第一个的话，需要手动触发
+                if (index === 0) {
+                    this.selectImg(this.form.ppt[0], 0)
+                } else {
+                    this.$refs.carousel.setActiveItem(0)
+                }
+            } else {
                 this.selectImg(this.form.ppt[0], 0)
+                this.$refs.form.validateField('ppt')
             }
         },
         fetchData() {
@@ -498,6 +504,46 @@ export default {
         .el-button {
             width: 100px;
         }
+    }
+    /deep/ .el-date-editor .el-range-separator {
+        width: 7%;
+    }
+    /deep/ .el-form-item__error {
+        right: 0;
+        width: 430px;
+        text-align: center;
+    }
+    /deep/ .el-carousel {
+        width: 512px;
+        margin: 10px auto 20px;
+        .el-carouser-index {
+            position: absolute;
+            margin: auto;
+            left: 0;
+            bottom: 10px;
+            right: 0;
+            width: 25px;
+            height: 25px;
+            line-height: 25px;
+            border-radius: 50%;
+            color: #fff;
+            background-color: red;
+            // background-color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            font-size: 14px;
+        }
+        .delete {
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    }
+    /deep/ .el-carousel__item {
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
     }
 }
 
