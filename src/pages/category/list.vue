@@ -1,7 +1,9 @@
 <template>
     <div class="page-Category-list">
         <header>
-            <div></div>
+            <div class="tips">
+                排序设定会影响在app端的展示顺序。排序规则,大的排前面，如果排序值一样，时间距离当前最近的排前面
+            </div>
             <!-- <el-input placeholder="请输入搜索信息"
                 suffix-icon="el-icon-search"
                 @keyup.enter.native="searchData"
@@ -353,6 +355,11 @@ export default {
 .page-Category-list {
     height: 100%;
     background-color: #fff;
+    .tips {
+        color: @color-gray;
+        font-size: 12px;
+        line-height: 36px;
+    }
     header {
         padding: 15px 20px;
         text-align: right;
