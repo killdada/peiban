@@ -68,8 +68,8 @@ xhttp.interceptors.response.use(
             error.response.status === 400 ||
             error.response.status === 401
         ) {
-            // cookie.remove('token')
-            // location.reload()
+            cookie.remove('token')
+            location.reload()
         }
         bus.$emit(String(error.response.status))
         return Promise.reject(error)
