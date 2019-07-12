@@ -11,39 +11,41 @@
     font-size: 16px;
     background: @bgcolor-page;
     color: @color-primary;
-    .page-sidebar{
+
+    .page-sidebar {
         border-right: 0;
         padding-top: 20px;
-        .el-menu-item{
+
+        .el-menu-item {
             text-align: center;
         }
     }
+
     >.el-header {
         background: #fff;
         box-shadow: @shadow-base;
     }
+
     .el-aside {
         background: #fff;
-        // box-shadow: 4px 60px 10px 0 #ECEEF1;
         z-index: 1;
     }
-    > .el-main {
+
+    >.el-main {
         padding: 0;
-        // width: 1200px;
-        // margin: 0 auto;
         flex-basis: 100%;
-        > .el-container {
+
+        >.el-container {
             border-top: 1px solid #F4F5F9;
         }
-    }
-    &.is-index {
-        background: url('~assets/img/img_home_illu_def.png') bottom ~'/' 100% no-repeat;
     }
 }
 
 .btn-danger {
     color: #F26175;
-    &:hover, &:focus {
+
+    &:hover,
+    &:focus {
         color: #F26175;
     }
 }
@@ -53,6 +55,7 @@
         padding: 12px 20px;
         background-color: @dialog-bg-color;
     }
+
     .el-dialog__title {
         font-weight: 700;
         font-size: 14px;
@@ -62,6 +65,7 @@
 
 .page-container {
     height: 100%;
+
     .el-menu-item {
         // height: 104px;
         padding: 20px;
@@ -69,37 +73,38 @@
         line-height: 1;
         font-size: 16px;
         color: @color-gray;
+
         &:hover {
             background: @color-menu-hover;
         }
+
         &.is-active {
             color: @color-blue;
         }
     }
+
     .page-sidebar {
         height: 100%;
         padding-top: 20px;
         min-height: 540px;
         position: relative;
-        background: url('~assets/img/img_basic_illu_def.png') center 96%
-            no-repeat;
     }
-    .el-main{
+
+    .el-main {
         background: #fff;
     }
 }
 
 
 
-.el-table{
-    // border-left: none;
-    // border-right: none;
-    &.hadBorder{
+.el-table {
+    &.hadBorder {
         border-left: 1px solid @border-color;
         border-right: 1px solid @border-color;
     }
-    .el-table__header{
-        th{
+
+    .el-table__header {
+        th {
             padding-top: 5px;
             padding-bottom: 5px;
             border-top: 1px solid #E6EAEE;
@@ -109,10 +114,12 @@
             font-weight: normal
         }
     }
-    .index-col{
+
+    .index-col {
         text-align: center
     }
-    .circle{
+
+    .circle {
         display: inline-block;
         width: 12px;
         height: 12px;
@@ -122,13 +129,16 @@
         margin-right: 5px;
         position: relative;
         top: 1px;
-        &.green{
+
+        &.green {
             border-color: #84b800
         }
-         &.blue{
+
+        &.blue {
             border-color: #1a91eb
         }
-         &.red{
+
+        &.red {
             border-color: #f8726e
         }
     }

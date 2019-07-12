@@ -15,11 +15,6 @@ const routes = [
         path: '/login',
         component: () => import('../pages/login/index')
     },
-    {
-        name: '404',
-        path: '/404.html',
-        component: () => import('../pages/404/index')
-    },
     // 课程管理
     {
         name: 'lesson',
