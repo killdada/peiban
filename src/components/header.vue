@@ -57,7 +57,8 @@ export default {
 
     methods: {
         fetchData() {
-            this.account = cookie.get('user_name')
+            this.account =
+                localStorage.getItem('username') || cookie.get('user_name')
         },
         keepMenu() {
             this.menuStatus.top = this.menuStatus.top || this.menuStatus.role
