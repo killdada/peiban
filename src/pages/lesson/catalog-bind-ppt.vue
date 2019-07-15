@@ -129,7 +129,12 @@
             title="大图"
             top="10vh"
         >
-            <img :src="imgUrl" alt="" />
+            <div
+                class="img"
+                :style="{
+                    backgroundImage: `url(${imgUrl})`
+                }"
+            ></div>
         </el-dialog>
     </div>
 </template>
@@ -521,6 +526,12 @@ export default {
 .preview-dialog /deep/ .el-dialog {
     overflow-x: hidden;
     text-align: center;
+    .img {
+        height: 80vh;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
 }
 
 .page-catalog-bind-ppt {
