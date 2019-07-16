@@ -189,6 +189,9 @@ export default {
                         imgUrl: res.img,
                         img: res.img_media_id
                     }
+                    if (res.category_id) {
+                        this.$set(this.form, 'category', res.category_id)
+                    }
                     this.$refs.form.clearValidate()
                 })
                 .catch(e => {
@@ -202,17 +205,16 @@ export default {
             this.$refs.form && this.$refs.form.resetFields()
         }
     },
-    created() {
-        if (this.$route.params.id) {
-            this.fetchDetail()
+    async created() {
+        try {
+            const res = await getLessonCategory()
+            this.options = res
+            if (this.$route.params.id) {
+                this.fetchDetail()
+            }
+        } catch (e) {
+            this.$message.error(e.message)
         }
-        getLessonCategory()
-            .then(res => {
-                this.options = res
-            })
-            .catch(e => {
-                this.$message.error(e.message)
-            })
     }
 }
 </script>
