@@ -21,7 +21,9 @@
                 width="70"
             >
             </el-table-column>
-            <el-table-column prop="username" min-width="200" label="姓名">
+            <el-table-column prop="username" min-width="200" label="账号">
+            </el-table-column>
+            <el-table-column prop="user_show_name" min-width="200" label="姓名">
             </el-table-column>
             <!-- <el-table-column prop="cateory_name"
                 label="所属云">
