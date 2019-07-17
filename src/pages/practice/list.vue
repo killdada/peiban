@@ -57,6 +57,7 @@
             </el-table-column>
         </el-table>
         <page-pagination
+            :pageSize="10"
             @currentChange="handleCurrentChange"
             :total="total"
         ></page-pagination>
@@ -139,6 +140,7 @@
                             </el-table-column>
                         </el-table>
                         <page-pagination
+                            :pageSize="10"
                             @currentChange="handleCurrentChangeReply"
                             :total="totalReply"
                         ></page-pagination>
@@ -352,6 +354,7 @@ export default {
                 .then(res => {
                     this.replyList = res.data || []
                     this.totalReply = res.total
+                    debugger
                 })
                 .catch(e => {
                     this.$message.error(e.message)

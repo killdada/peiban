@@ -54,6 +54,7 @@
             </el-table-column>
         </el-table>
         <page-pagination
+            :pageSize="10"
             @currentChange="handleCurrentChange"
             :total="total"
         ></page-pagination>
