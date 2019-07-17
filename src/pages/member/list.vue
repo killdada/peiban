@@ -159,6 +159,7 @@ export default {
         },
 
         gotoEdit(item) {
+            this.pageRecord = 1
             this.showDialog = true
             this.id = item.username
             this.fetchDetail()

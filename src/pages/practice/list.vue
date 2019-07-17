@@ -316,6 +316,7 @@ export default {
                 })
         },
         gotoEdit(item) {
+            this.pageReply = 1
             this.showDialog = true
             this.id = item.id
             this.fetchDetail()
@@ -354,7 +355,6 @@ export default {
                 .then(res => {
                     this.replyList = res.data || []
                     this.totalReply = res.total
-                    debugger
                 })
                 .catch(e => {
                     this.$message.error(e.message)
