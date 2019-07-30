@@ -15,14 +15,6 @@
                 >
             </div>
             <el-table :data="data">
-                <el-table-column
-                    type="index"
-                    label-class-name="index-col"
-                    class-name="index-col"
-                    label="序号"
-                    width="70"
-                >
-                </el-table-column>
                 <el-table-column prop="name" width="150" label="目录名称">
                 </el-table-column>
                 <el-table-column min-width="200" label="目录素材截图">

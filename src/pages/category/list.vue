@@ -19,14 +19,6 @@
             >
         </header>
         <el-table :data="data" v-loading="loading">
-            <el-table-column
-                type="index"
-                label-class-name="index-col"
-                class-name="index-col"
-                label="序号"
-                width="70"
-            >
-            </el-table-column>
             <el-table-column prop="name" min-width="200" label="名称">
             </el-table-column>
             <el-table-column label="状态">

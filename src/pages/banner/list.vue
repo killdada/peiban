@@ -17,14 +17,6 @@
             >
         </header>
         <el-table :data="data" v-loading="loading">
-            <el-table-column
-                type="index"
-                label-class-name="index-col"
-                class-name="index-col"
-                label="序号"
-                width="70"
-            >
-            </el-table-column>
             <el-table-column width="150" label="轮播图片">
                 <template slot-scope="scope">
                     <img

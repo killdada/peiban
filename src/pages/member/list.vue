@@ -13,14 +13,6 @@
             </el-button>
         </header>
         <el-table :data="data" v-loading="loading">
-            <el-table-column
-                type="index"
-                label-class-name="index-col"
-                class-name="index-col"
-                label="序号"
-                width="70"
-            >
-            </el-table-column>
             <el-table-column prop="username" min-width="200" label="账号">
             </el-table-column>
             <el-table-column prop="user_show_name" min-width="200" label="姓名">
@@ -66,14 +58,6 @@
                 class="hadBorder"
                 height="500px"
             >
-                <el-table-column
-                    type="index"
-                    label-class-name="index-col"
-                    class-name="index-col"
-                    label="序号"
-                    width="70"
-                >
-                </el-table-column>
                 <el-table-column prop="category" label="课程分类">
                 </el-table-column>
                 <el-table-column prop="course_name" label="课程名称">

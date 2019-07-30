@@ -20,14 +20,6 @@
         </header>
 
         <el-table :data="data" v-loading="loading.list">
-            <el-table-column
-                type="index"
-                label-class-name="index-col"
-                class-name="index-col"
-                label="序号"
-                width="70"
-            >
-            </el-table-column>
             <el-table-column prop="show_name" min-width="200" label="素材标题">
             </el-table-column>
             <el-table-column label="素材类型">
@@ -88,14 +80,6 @@
                     </div>
                 </div>
                 <el-table :data="fileList">
-                    <el-table-column
-                        type="index"
-                        label-class-name="index-col"
-                        class-name="index-col"
-                        label="序号"
-                        width="70"
-                    >
-                    </el-table-column>
                     <el-table-column prop="name" min-width="100" label="文件名">
                     </el-table-column>
                     <el-table-column label="文件大小">

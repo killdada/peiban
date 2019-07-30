@@ -17,14 +17,6 @@
         </header>
         <el-table :data="data" v-loading="loading">
             <el-table-column
-                type="index"
-                label-class-name="index-col"
-                class-name="index-col"
-                label="序号"
-                width="70"
-            >
-            </el-table-column>
-            <el-table-column
                 prop="course_name"
                 min-width="200"
                 label="所属课程"
@@ -115,20 +107,12 @@
                             height="300px"
                         >
                             <el-table-column
-                                type="index"
-                                label-class-name="index-col"
-                                class-name="index-col"
-                                label="序号"
-                                width="70"
-                            >
-                            </el-table-column>
-                            <el-table-column
+                                show-overflow-tooltip
                                 prop="content"
-                                width="150"
                                 label="练习回复"
                             >
                             </el-table-column>
-                            <el-table-column label="操作" min-width="150">
+                            <el-table-column label="操作" width="150">
                                 <template slot-scope="scope">
                                     <el-button
                                         type="text"

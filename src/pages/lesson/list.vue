@@ -17,14 +17,6 @@
             >
         </header>
         <el-table :data="data" v-loading="loading">
-            <el-table-column
-                type="index"
-                label-class-name="index-col"
-                class-name="index-col"
-                label="序号"
-                width="70"
-            >
-            </el-table-column>
             <el-table-column prop="img" width="150" label="课程图片">
                 <template slot-scope="scope">
                     <img :src="scope.row.img" width="100" height="100" alt="" />
