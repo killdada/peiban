@@ -5,7 +5,10 @@
         element-loading-text="PDF转存png中"
     >
         <div class="play-wrapper">
-            <div id="player"></div>
+            <video-player-component
+                v-if="form.video_url"
+                :url="form.video_url"
+            ></video-player-component>
         </div>
         <div class="pptform">
             <el-form
@@ -143,13 +146,17 @@
 import { updateCatalog, getCatalogDetail, getPdfimg } from 'src/api/lesson'
 import { uploadImg } from 'src/api/common'
 import { qiniuUpload } from 'src/utils/qiniu'
-import { download, loader, localStorageUtils } from 'appcloud-component'
+import { download, localStorageUtils } from 'appcloud-component'
+import videoPlayerComponent from 'src/components/video-player-component'
 
 const pptTimeDefault = ['00:00:00', '00:00:00']
 
 export default {
     name: 'catalogBindPpt',
     mixins: [download],
+    components: {
+        videoPlayerComponent
+    },
     data() {
         const vaildppt = (rule, value, callback) => {
             if (value.length) {
@@ -262,25 +269,6 @@ export default {
                 this.$message.error('PDF上传失败')
             }
             this.uploading = false
-        },
-        loadPlayer() {
-            this.$nextTick(() => {
-                loader.JS(
-                    'https://sdk-release.qnsdk.com/qiniu-web-player-1.2.0.js',
-                    this.loadedCallback
-                )
-            })
-        },
-        loadedCallback() {
-            const container = document.getElementById('player')
-            // eslint-disable-next-line
-            const player = new QPlayer({
-                url:
-                    this.form.vedio_url ||
-                    'http://demo-videos.qnsdk.com/movies/qiniu.mp4',
-                container,
-                autoplay: true
-            })
         },
         // 计算时间秒
         countSec(time) {
@@ -507,7 +495,6 @@ export default {
                     } catch (error) {
                         //
                     }
-                    this.loadPlayer()
                 })
                 .finally(() => {
                     this.loading = false

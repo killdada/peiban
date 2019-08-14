@@ -10,6 +10,7 @@
         "lint": "vue-cli-service lint"
     },
     "dependencies": {
+        "appcloud-component": "git+ssh://git@git.mysoft.com.cn:b2c-platform/appcloud-component.git",
         "axios": "^0.18.0",
         "core-js": "^2.6.5",
         "element-ui": "^2.8.2",
@@ -22,9 +23,9 @@
         "qiniu-js": "^2.5.4",
         "vue": "^2.6.10",
         "vue-router": "^3.0.3",
+        "vue-video-player": "^5.0.2",
         "vuedraggable": "^2.21.0",
-        "vuex": "^3.0.1",
-        "appcloud-component": "git+ssh://git@git.mysoft.com.cn:b2c-platform/appcloud-component.git"
+        "vuex": "^3.0.1"
     },
     "devDependencies": {
         "@vue/cli-plugin-babel": "^3.7.0",
@@ -33,6 +34,7 @@
         "@vue/eslint-config-prettier": "^4.0.1",
         "babel-eslint": "^10.0.1",
         "eslint": "^5.16.0",
+        "eslint-plugin-prettier": "^3.1.0",
         "eslint-plugin-vue": "^5.0.0",
         "less": "^3.9.0",
         "less-loader": "^5.0.0",
