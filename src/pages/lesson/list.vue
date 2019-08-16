@@ -40,13 +40,19 @@
                     >
                     <el-button
                         type="text"
-                        v-if="scope.row.status === 0"
+                        v-if="scope.row.status === 0 || scope.row.status === 2"
                         @click="publish(scope.row)"
                         >发布</el-button
                     >
-                    <!-- <el-button type="text"
+                    <el-button type="text" v-else @click="downLesson(scope.row)"
+                        >下架</el-button
+                    >
+                    <el-button
+                        type="text"
                         class="delete"
-                        @click="deleteLesson(scope.row.id)">删除</el-button> -->
+                        @click="deleteLesson(scope.row.id)"
+                        >删除</el-button
+                    >
                 </template>
             </el-table-column>
         </el-table>
@@ -70,7 +76,12 @@
 
 <script>
 import { uploadImg } from 'src/api/common'
-import { getLessonList, delLesson, publishLesson } from 'src/api/lesson'
+import {
+    getLessonList,
+    delLesson,
+    publishLesson,
+    downLesson
+} from 'src/api/lesson'
 import lessonForm from './lesson-form'
 
 export default {
@@ -139,6 +150,18 @@ export default {
                 .finally(() => {
                     this.loading = false
                 })
+        },
+
+        async downLesson({ id }) {
+            try {
+                await downLesson(id)
+                this.$message.success('下架成功')
+                this.fetchData()
+            } catch (error) {
+                this.$message.error(
+                    `下架失败${error.message || error.msg || ''}`
+                )
+            }
         },
 
         deleteLesson(id) {

@@ -5,6 +5,11 @@ export function publishLesson(id) {
     return xhttp.put(`/lesson/list/pub/${id}`)
 }
 
+// 下架课程
+export function downLesson(id) {
+    return xhttp.put(`/lesson/list/down/${id}`)
+}
+
 // 获取课程列表
 export function getLessonList(params) {
     return xhttp.get('/lesson/list', { params })
@@ -22,7 +27,7 @@ export function getLessonCategory() {
 
 // 删除课程
 export function delLesson(lessonID) {
-    return xhttp.delete(`/lesson/list/${lessonID}`)
+    return xhttp.delete(`/lesson/${lessonID}`)
 }
 
 // 增加课程
@@ -68,4 +73,9 @@ export function getPolicy() {
 // 上传PDF以后保存接口，获取png图片列表
 export function getPdfimg(params) {
     return xhttp.post('/pdf2png', params)
+}
+
+// 绑定ppt
+export function bindppt(courseId, catalogId, params) {
+    return xhttp.post(`/lesson/catalog/${courseId}/${catalogId}/image`, params)
 }

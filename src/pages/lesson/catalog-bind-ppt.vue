@@ -143,7 +143,7 @@
 </template>
 
 <script>
-import { updateCatalog, getCatalogDetail, getPdfimg } from 'src/api/lesson'
+import { getCatalogDetail, getPdfimg, bindppt } from 'src/api/lesson'
 import { uploadImg } from 'src/api/common'
 import { qiniuUpload } from 'src/utils/qiniu'
 import { download, localStorageUtils } from 'appcloud-component'
@@ -386,7 +386,9 @@ export default {
                     }
                     this.btnloading = true
 
-                    updateCatalog(this.lessonID, this.catalogId, this.form)
+                    bindppt(this.lessonID, this.catalogId, {
+                        images: this.form.ppt
+                    })
                         .then(() => {
                             this.$message.success('绑定成功')
                             this.formVisible = false

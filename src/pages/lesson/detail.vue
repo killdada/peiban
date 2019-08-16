@@ -41,7 +41,10 @@
                         >
                         <el-button
                             type="text"
-                            v-if="scope.row.video_media_type === 3"
+                            v-if="
+                                scope.row.video_media_type === 3 ||
+                                    scope.row.video_type === 3
+                            "
                             @click="gotoBindppt(scope.row)"
                             >绑定ppt</el-button
                         >
