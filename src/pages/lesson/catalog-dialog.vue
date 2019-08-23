@@ -46,7 +46,7 @@
                     <el-radio :label="2">从素材库选择</el-radio>
                 </el-radio-group>
                 <template v-if="form.upload_type === 1">
-                    <div class="single  upload-vedio-container">
+                    <div class="single upload-vedio-container">
                         <div
                             :title="
                                 uploadlingVideo
@@ -61,15 +61,13 @@
                                 @click="selectFile"
                                 :class="uploadlingVideo && 'disabled'"
                             >
-                                <span
-                                    >您选择的文件：{{
-                                        currentFileObj.name
-                                    }}</span
-                                >
-                                <strong v-if="currentFileObj.percent > 0"
-                                    >已上传
-                                    {{ currentFileObj.percent }}%</strong
-                                >
+                                <span>
+                                    您选择的文件：{{ currentFileObj.name }}
+                                </span>
+                                <strong v-if="currentFileObj.percent > 0">
+                                    已上传
+                                    {{ currentFileObj.percent }}%
+                                </strong>
                                 <el-button
                                     size="small"
                                     :disabled="uploadlingVideo"
@@ -89,7 +87,7 @@
                             type="file"
                             id="upload"
                             style="display: none"
-                            accept="video/*,audio/*"
+                            accept="video/*, audio/*"
                             @change="uploadfile"
                         />
                     </div>
@@ -107,17 +105,8 @@
                         :key="item.media_id"
                         :label="item.show_name"
                         :value="item.media_id"
-                    >
-                    </el-option>
+                    ></el-option>
                 </el-select>
-            </el-form-item>
-            <el-form-item label="目录素材时长" prop="play_time">
-                <el-time-picker
-                    v-model="form.play_time"
-                    value-format="HH:mm:ss"
-                    placeholder="选择时间范围"
-                >
-                </el-time-picker>
             </el-form-item>
         </el-form>
 
@@ -163,8 +152,7 @@ export default {
                 vediobind: '', // 绑定视频的值
                 vedio_url: '',
                 desc: '', // 目录描述
-                upload_type: 1, // 1 .自上传，2.选择
-                play_time: ''
+                upload_type: 1 // 1 .自上传，2.选择
             },
             formVisible: false,
             rules: {
@@ -199,9 +187,8 @@ export default {
         }
     },
     methods: {
-        changeSelectMaterial(val) {
-            const item = this.materialList.find(item => item.media_id === val)
-            item && this.getMaterialTimes(item.media_url)
+        changeSelectMaterial() {
+            //
         },
         changeMethod() {
             this.$refs.form.clearValidate('vedio')
@@ -229,22 +216,7 @@ export default {
             const s = parseInt(time % 60, 10)
             return `${this.addzero(h)}:${this.addzero(m)}:${this.addzero(s)}`
         },
-        getMaterialTimes(audioUrl) {
-            let url = audioUrl
-            if (!audioUrl) {
-                const obj_file = document.getElementById('upload')
-                const content = obj_file.files[0]
-                //获取录音时长
-                url = URL.createObjectURL(content)
-            }
-            //经测试，发现audio也可获取视频的时长
-            const audioElement = new Audio(url)
-            let duration
-            audioElement.addEventListener('loadedmetadata', () => {
-                duration = audioElement.duration
-                this.$set(this.form, 'play_time', this.forMatTime(duration))
-            })
-        },
+
         updateFileObj(params, row) {
             this.currentFileObj = {
                 ...this.currentFileObj,
@@ -257,7 +229,6 @@ export default {
                 } else if (params.status === 'completed') {
                     this.$message.success('素材上传成功')
                     this.form.vedio = row.name
-                    this.getMaterialTimes()
                 }
                 this.uploadlingVideo = false
             }
@@ -291,7 +262,6 @@ export default {
                     .then(res => {
                         const result = {
                             media_type: res.media_type,
-                            play_time: res.play_time,
                             id: res.id,
                             name: res.name, // 目录名称
                             alias: res.alias, // 目录别名
