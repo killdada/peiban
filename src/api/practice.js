@@ -5,6 +5,11 @@ export function getPracticeList(params) {
     return xhttp.get('/practice', { params })
 }
 
+// 获取已经绑定的课程列表，后续新增的练习不能在绑定，一个课程下只能有一个练习
+export function getBindCourses() {
+    return xhttp.get('/practice/can-bind-courses')
+}
+
 // 获取练习详情
 export function getPracticeDetail(lessonID) {
     return xhttp.get(`/practice/${lessonID}`)

@@ -7,7 +7,7 @@
                 @keyup.enter.native="searchData"
                 size="medium"
                 v-model.trim="key">
-            </el-input> -->
+      </el-input>-->
             <el-button
                 type="primary"
                 @click="gotoAdd"
@@ -23,7 +23,7 @@
                         :src="scope.row.img_media_url"
                         width="100"
                         height="100"
-                        alt=""
+                        alt
                     />
                 </template>
             </el-table-column>
@@ -31,10 +31,11 @@
                 prop="course_name"
                 min-width="200"
                 label="所属课程"
-            >
-            </el-table-column>
-            <el-table-column prop="category_name" label="所属分类">
-            </el-table-column>
+            ></el-table-column>
+            <el-table-column
+                prop="category_name"
+                label="所属分类"
+            ></el-table-column>
             <el-table-column label="操作" min-width="150">
                 <template slot-scope="scope">
                     <el-button type="text" @click="gotoEdit(scope.row)"
@@ -49,11 +50,7 @@
                 </template>
             </el-table-column>
         </el-table>
-        <page-pagination
-            :pageSize="10"
-            @currentChange="handleCurrentChange"
-            :total="total"
-        ></page-pagination>
+        <!-- <page-pagination :pageSize="10" @currentChange="handleCurrentChange" :total="total"></page-pagination> -->
 
         <el-dialog
             :title="!id ? '新建轮播' : '编辑轮播'"
@@ -85,10 +82,9 @@
                     <el-form-item label="轮播图" prop="img_media_id">
                         <img-loader
                             v-model="form.img_url"
-                            action=""
+                            action
                             :httpRequest="customUpload"
-                        >
-                        </img-loader>
+                        ></img-loader>
                     </el-form-item>
                 </el-form>
                 <div class="submit-btn">
@@ -183,8 +179,7 @@ export default {
                 page: page || this.page || 1
             })
                 .then(res => {
-                    this.data = res.data
-                    this.total = res.total
+                    this.data = res
                 })
                 .catch(e => {
                     this.$message.error(e.message)

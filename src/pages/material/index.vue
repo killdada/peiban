@@ -7,8 +7,7 @@
                 @keyup.enter.native="fetchData"
                 size="medium"
                 v-model.trim="key"
-            >
-            </el-input>
+            ></el-input>
             <el-button
                 type="primary"
                 class="page-material-manage__add"
@@ -20,20 +19,26 @@
         </header>
 
         <el-table :data="data" v-loading="loading.list">
-            <el-table-column prop="show_name" min-width="200" label="素材标题">
-            </el-table-column>
+            <el-table-column
+                prop="show_name"
+                min-width="200"
+                label="素材标题"
+            ></el-table-column>
             <el-table-column label="素材类型">
-                <template slot-scope="{ row }">
-                    {{ row.media_type === 3 ? '视频' : '音频' }}
-                </template>
+                <template slot-scope="{ row }">{{
+                    row.media_type === 3 ? '视频' : '音频'
+                }}</template>
             </el-table-column>
             <el-table-column min-width="200" label="素材大小">
-                <template slot-scope="{ row }">
-                    {{ Math.ceil(row.size / 1024 / 1024) }} MB
-                </template>
+                <template slot-scope="{ row }"
+                    >{{ Math.ceil(row.size / 1024 / 1024) }} MB</template
+                >
             </el-table-column>
-            <el-table-column prop="created_at" min-width="200" label="创建时间">
-            </el-table-column>
+            <el-table-column
+                prop="created_at"
+                min-width="200"
+                label="创建时间"
+            ></el-table-column>
             <el-table-column label="操作" min-width="150">
                 <template slot-scope="scope">
                     <el-button type="text" @click="openEdit(scope.row)"
@@ -41,12 +46,12 @@
                     >
                     <!-- <el-button type="text"
                         class="delete"
-                        @click="deleteMaterial(scope.row.id)">删除</el-button> -->
+          @click="deleteMaterial(scope.row.id)">删除</el-button>-->
                 </template>
             </el-table-column>
         </el-table>
         <page-pagination
-            :pageSize="10"
+            :pageSize="pageSize"
             @currentChange="handleCurrentChange"
             :total="total"
         ></page-pagination>
@@ -57,9 +62,7 @@
             class="upload-dialog"
             :visible.sync="showDialog"
         >
-            <div class="upload-dialog__tips">
-                单个素材最好不超过5G
-            </div>
+            <div class="upload-dialog__tips">单个素材最好不超过5G</div>
             <div class="upload-dialog__content">
                 <div id="uploadvideo-container">
                     <el-button
@@ -75,17 +78,20 @@
                             id="uploadinput"
                             multiple
                             @change="changefile"
-                            accept="video/*,audio/*"
+                            accept="video/*, audio/*"
                         />
                     </div>
                 </div>
                 <el-table :data="fileList">
-                    <el-table-column prop="name" min-width="100" label="文件名">
-                    </el-table-column>
+                    <el-table-column
+                        prop="name"
+                        min-width="100"
+                        label="文件名"
+                    ></el-table-column>
                     <el-table-column label="文件大小">
-                        <template slot-scope="{ row }">
-                            {{ Math.ceil(row.size / 1024 / 1024) }} M
-                        </template>
+                        <template slot-scope="{ row }"
+                            >{{ Math.ceil(row.size / 1024 / 1024) }} M</template
+                        >
                     </el-table-column>
                     <el-table-column label="操作" min-width="300">
                         <template slot-scope="{ row }">
@@ -182,7 +188,8 @@ export default {
                 saveMaterial: false
             },
             fileList: [],
-            key: ''
+            key: '',
+            pageSize: 10
         }
     },
     components: {},
@@ -380,6 +387,7 @@ export default {
                 .then(res => {
                     this.data = res.data
                     this.total = res.total
+                    this.pageSize = res.per_page
                 })
                 .catch(e => {
                     this.$message.error(e.message)

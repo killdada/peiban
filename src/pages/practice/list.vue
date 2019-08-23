@@ -6,7 +6,7 @@
                 @keyup.enter.native="searchData"
                 size="medium"
                 v-model.trim="key">
-            </el-input> -->
+      </el-input>-->
             <el-button
                 type="primary"
                 @click="gotoAdd"
@@ -20,20 +20,22 @@
                 prop="course_name"
                 min-width="200"
                 label="所属课程"
-            >
-            </el-table-column>
-            <el-table-column prop="category_name" label="所属分类">
-            </el-table-column>
-            <el-table-column prop="publisher" label="发起人"> </el-table-column>
-            <el-table-column prop="topic" label="练习主题"> </el-table-column>
-            <el-table-column prop="practice_num" label="练习回复数">
-            </el-table-column>
+            ></el-table-column>
+            <el-table-column
+                prop="category_name"
+                label="所属分类"
+            ></el-table-column>
+            <el-table-column prop="publisher" label="发起人"></el-table-column>
+            <el-table-column prop="topic" label="练习主题"></el-table-column>
+            <el-table-column
+                prop="practice_num"
+                label="练习回复数"
+            ></el-table-column>
             <el-table-column
                 prop="lastest_practice_reply"
                 show-overflow-tooltip
                 label="最新练习回复"
-            >
-            </el-table-column>
+            ></el-table-column>
             <el-table-column label="操作" min-width="150">
                 <template slot-scope="scope">
                     <el-button type="text" @click="gotoEdit(scope.row)"
@@ -54,12 +56,21 @@
             :total="total"
         ></page-pagination>
 
-        <el-dialog
-            :title="!id ? '新建练习' : '练习详情'"
-            width="700px"
-            @close="resetForm"
-            :visible.sync="showDialog"
-        >
+        <el-dialog width="700px" @close="resetForm" :visible.sync="showDialog">
+            <div slot="title">
+                <span v-if="!id">
+                    新建练习
+                    <el-tooltip
+                        class="item"
+                        effect="dark"
+                        content="一个课程只能绑定一个练习"
+                        placement="right"
+                    >
+                        <i class="el-icon-info"></i>
+                    </el-tooltip>
+                </span>
+                <span v-else>练习详情</span>
+            </div>
             <div class="Practice-form" v-loading="loadingDetail">
                 <el-form
                     :model="form"
@@ -78,6 +89,7 @@
                                 :label="option.name"
                                 v-for="option in options"
                                 :key="option.id"
+                                :disabled="option.disabled"
                                 :value="option.id"
                             ></el-option>
                         </el-select>
@@ -110,8 +122,7 @@
                                 show-overflow-tooltip
                                 prop="content"
                                 label="练习回复"
-                            >
-                            </el-table-column>
+                            ></el-table-column>
                             <el-table-column label="操作" width="150">
                                 <template slot-scope="scope">
                                     <el-button
@@ -151,7 +162,8 @@ import {
     getPracticeDetail,
     addPractice,
     getReplyList,
-    delReply
+    delReply,
+    getBindCourses
 } from 'src/api/practice'
 
 export default {
@@ -205,6 +217,18 @@ export default {
     },
     components: {},
     methods: {
+        async getBindCourse() {
+            try {
+                const res = await getBindCourses()
+                this.options = this.options.map(item => {
+                    // 已经绑定过的课程不能重复绑定，一个课程只有一个练习
+                    item.disabled = !!res.find(list => list.id === item.id)
+                    return item
+                })
+            } catch (error) {
+                //
+            }
+        },
         refreshData() {
             this.fetchData()
             this.showDialog = false
@@ -212,9 +236,14 @@ export default {
         resetForm() {
             this.$refs.form.resetFields()
         },
-        gotoAdd() {
-            this.showDialog = true
-            this.id = ''
+        async gotoAdd() {
+            try {
+                await this.getBindCourse()
+                this.showDialog = true
+                this.id = ''
+            } catch (error) {
+                //
+            }
         },
         handleCurrentChangeReply(val) {
             this.pageReply = val
