@@ -7,33 +7,43 @@
                 @keyup.enter.native="searchData"
                 size="medium"
                 v-model.trim="key">
-            </el-input> -->
+      </el-input>-->
             <el-button type="primary" size="medium">
                 <a :href="reportLink" style="color: #fff">生成报表</a>
             </el-button>
         </header>
         <el-table :data="data" v-loading="loading">
-            <el-table-column prop="username" min-width="200" label="账号">
-            </el-table-column>
-            <el-table-column prop="user_show_name" min-width="200" label="姓名">
-            </el-table-column>
+            <el-table-column
+                prop="username"
+                min-width="200"
+                label="账号"
+            ></el-table-column>
+            <el-table-column
+                prop="user_show_name"
+                min-width="200"
+                label="姓名"
+            ></el-table-column>
             <!-- <el-table-column prop="cateory_name"
                 label="所属云">
-            </el-table-column> -->
+      </el-table-column>-->
             <el-table-column prop="week_time" label="本周学习时长">
-                <template slot-scope="scope">
-                    {{ format(scope.row.week_time) }}
-                </template>
+                <template slot-scope="scope">{{
+                    format(scope.row.week_time)
+                }}</template>
             </el-table-column>
-            <el-table-column prop="practice_week_num" label="本周练习次数">
-            </el-table-column>
+            <el-table-column
+                prop="practice_week_num"
+                label="本周练习次数"
+            ></el-table-column>
             <el-table-column prop="total_time" label="累计学习时长">
-                <template slot-scope="scope">
-                    {{ format(scope.row.total_time) }}
-                </template>
+                <template slot-scope="scope">{{
+                    format(scope.row.total_time)
+                }}</template>
             </el-table-column>
-            <el-table-column prop="practice_total_num" label="累计练习次数">
-            </el-table-column>
+            <el-table-column
+                prop="practice_total_num"
+                label="累计练习次数"
+            ></el-table-column>
             <el-table-column label="操作" min-width="150">
                 <template slot-scope="scope">
                     <el-button type="text" @click="gotoEdit(scope.row)"
@@ -41,12 +51,12 @@
                     >
                     <!-- <el-button type="text"
                         class="delete"
-                        @click="deleteMember(scope.row.id)">删除</el-button> -->
+          @click="deleteMember(scope.row.id)">删除</el-button>-->
                 </template>
             </el-table-column>
         </el-table>
         <page-pagination
-            :pageSize="10"
+            :pageSize="pageSize"
             @currentChange="handleCurrentChange"
             :total="total"
         ></page-pagination>
@@ -58,14 +68,18 @@
                 class="hadBorder"
                 height="500px"
             >
-                <el-table-column prop="category" label="课程分类">
-                </el-table-column>
-                <el-table-column prop="course_name" label="课程名称">
-                </el-table-column>
+                <el-table-column
+                    prop="category"
+                    label="课程分类"
+                ></el-table-column>
+                <el-table-column
+                    prop="course_name"
+                    label="课程名称"
+                ></el-table-column>
                 <el-table-column width="150" label="共计学习时长">
-                    <template slot-scope="scope">
-                        {{ format(scope.row.learning_time) }}
-                    </template>
+                    <template slot-scope="scope">{{
+                        format(scope.row.learning_time)
+                    }}</template>
                 </el-table-column>
             </el-table>
             <page-pagination
@@ -94,7 +108,8 @@ export default {
             dataRecord: [],
             reportLink,
             page: 1,
-            pageRecord: 1
+            pageRecord: 1,
+            pageSize: 10
         }
     },
     components: {},
@@ -131,6 +146,13 @@ export default {
                 page: page || this.page || 1
             })
                 .then(res => {
+                    if (res.max_page == 1) {
+                        // 只有一页的情况下无法预估页码，直接用当前列表长度
+                        this.pageSize = res.list.length || 20
+                    } else if (this.page === 1) {
+                        // 页码只需要设置第一页返回的个数即可
+                        this.pageSize = res.list.length || 20
+                    }
                     this.data = res.list
                     this.total = res.sum
                 })
