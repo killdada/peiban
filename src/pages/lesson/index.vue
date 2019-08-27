@@ -85,7 +85,5 @@ export default {
     &-header {
         background-color: #fff;
     }
-    &-main {
-    }
 }
 </style>

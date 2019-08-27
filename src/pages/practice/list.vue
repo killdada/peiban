@@ -89,7 +89,7 @@
                                 :label="option.name"
                                 v-for="option in options"
                                 :key="option.id"
-                                :disabled="option.disabled"
+                                :disabled="!option.canBind"
                                 :value="option.id"
                             ></el-option>
                         </el-select>
@@ -222,7 +222,7 @@ export default {
                 const res = await getBindCourses()
                 this.options = this.options.map(item => {
                     // 已经绑定过的课程不能重复绑定，一个课程只有一个练习
-                    item.disabled = !!res.find(list => list.id === item.id)
+                    item.canBind = !!res.find(list => list.id === item.id)
                     return item
                 })
             } catch (error) {

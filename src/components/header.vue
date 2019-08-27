@@ -102,10 +102,6 @@ export default {
 
 @img: '../assets/img';
 
-.header-center .page-header {
-    // width: @width-index;
-}
-
 .page-header {
     display: flex;
     width: 100%;
