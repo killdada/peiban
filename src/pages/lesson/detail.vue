@@ -1,7 +1,7 @@
 <template>
     <div class="lesson-detail">
         <x-card title="课程信息">
-            <lesson-form ref="lessonForm"> </lesson-form>
+            <lesson-form ref="lessonForm"></lesson-form>
         </x-card>
 
         <x-card title="目录信息" v-loading="loading" class="catalog-info">
@@ -15,25 +15,36 @@
                 >
             </div>
             <el-table :data="data">
-                <el-table-column prop="name" width="150" label="目录名称">
-                </el-table-column>
+                <el-table-column
+                    prop="name"
+                    width="150"
+                    label="目录名称"
+                ></el-table-column>
                 <el-table-column min-width="200" label="目录素材截图">
                     <template slot-scope="scope">
                         <img
                             :src="scope.row.video_img_url"
                             width="100"
                             height="100"
-                            alt=""
+                            alt
                         />
                     </template>
                 </el-table-column>
                 <el-table-column label="类型">
                     <template slot-scope="scope">
-                        {{ scope.row.video_media_type === 3 ? '视频' : '音频' }}
+                        {{
+                            scope.row.video_media_type === 3 ||
+                            scope.row.video_type === 3
+                                ? '视频'
+                                : '音频'
+                        }}
                     </template>
                 </el-table-column>
-                <el-table-column prop="desc" min-width="200" label="目录描述">
-                </el-table-column>
+                <el-table-column
+                    prop="desc"
+                    min-width="200"
+                    label="目录描述"
+                ></el-table-column>
                 <el-table-column label="操作" min-width="150">
                     <template slot-scope="scope">
                         <el-button type="text" @click="openDialog(scope.row)"

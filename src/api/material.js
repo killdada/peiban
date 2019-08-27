@@ -10,6 +10,11 @@ export function getMaterials(params) {
     return xhttp.get('/material', { params })
 }
 
+// 获取全部素材接口
+export function getMaterialsAll(params) {
+    return xhttp.get('/material_all', { params })
+}
+
 // 更新素材标题
 export function updateMaterial(id, params) {
     return xhttp.put(`/material/${id}`, params)

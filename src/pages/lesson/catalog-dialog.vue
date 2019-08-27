@@ -61,9 +61,11 @@
                                 @click="selectFile"
                                 :class="uploadlingVideo && 'disabled'"
                             >
-                                <span>
-                                    您选择的文件：{{ currentFileObj.name }}
-                                </span>
+                                <span
+                                    >您选择的文件：{{
+                                        currentFileObj.name
+                                    }}</span
+                                >
                                 <strong v-if="currentFileObj.percent > 0">
                                     已上传
                                     {{ currentFileObj.percent }}%
@@ -125,7 +127,7 @@
 
 <script>
 import { addCatalog, updateCatalog, getCatalogDetail } from 'src/api/lesson'
-import { getMaterials } from 'src/api/material'
+import { getMaterialsAll } from 'src/api/material'
 import { qiniuUpload } from 'src/utils/qiniu'
 
 export default {
@@ -195,8 +197,8 @@ export default {
         },
         async getMaterials() {
             try {
-                const res = await getMaterials()
-                this.materialList = res.data || []
+                const res = await getMaterialsAll()
+                this.materialList = res || []
             } catch (error) {
                 //
             }

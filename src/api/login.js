@@ -9,5 +9,5 @@ export function getUserInfo() {
 }
 
 export function logOut() {
-    return xhttp.get('/logout')
+    return xhttp.post('/logout')
 }
