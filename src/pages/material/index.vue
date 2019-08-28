@@ -121,14 +121,14 @@
                 </el-table>
                 <div class="batch-btn" v-if="fileList.length">
                     <div>
-                        <el-button size="small" @click="fileActionAll"
+                        <el-button
+                            size="small"
+                            @click="fileActionAll"
+                            title="点击从上次的位置接着上传，再次点击相当于暂停全部"
                             >全部开始上传</el-button
                         >
                         <el-button size="small" @click="fileActionAll('pause')"
                             >全部暂停上传</el-button
-                        >
-                        <el-button size="small" @click="fileActionAll"
-                            >全部继续上传</el-button
                         >
                     </div>
                     <div>
