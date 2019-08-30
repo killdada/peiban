@@ -75,7 +75,6 @@
 </template>
 
 <script>
-import { uploadImg } from 'src/api/common'
 import {
     getLessonList,
     delLesson,
@@ -87,7 +86,6 @@ import lessonForm from './lesson-form'
 export default {
     data() {
         return {
-            action: uploadImg,
             data: [],
             loading: false,
             total: 0,

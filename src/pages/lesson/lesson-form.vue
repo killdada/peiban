@@ -58,7 +58,6 @@
 </template>
 
 <script>
-import { uploadImg } from 'src/api/common'
 import {
     getLessonDetail,
     getLessonCategory,
@@ -70,8 +69,6 @@ import { qiniuUpload } from 'src/utils/qiniu'
 export default {
     data() {
         return {
-            action: uploadImg,
-            imgData: { media_type: 1 },
             form: {
                 id: 1,
                 img: '', // 课程图片

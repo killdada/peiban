@@ -1,10 +1,4 @@
 import xhttp from 'src/utils/xhttp'
-import { extendUrl } from 'src/utils/httpQuery'
-import getBaseURL from 'src/const/baseURL'
-
-const baseURL = getBaseURL()
-
-export const uploadImg = extendUrl(`${baseURL}/college/upload`)
 
 export function uploadFile(params) {
     return xhttp.post('/college/upload', params)

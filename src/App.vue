@@ -1,5 +1,5 @@
 <template>
-    <div id="app" v-if="!isLogin">
+    <div id="app" v-if="isLoginPage">
         <router-view></router-view>
     </div>
     <el-container class="header-center" id="app" v-else>
@@ -14,7 +14,6 @@
 
 <script>
 import UiHeader from 'components/header'
-import cookie from 'js-cookie'
 
 export default {
     name: 'faceVenueSignin',
@@ -27,8 +26,8 @@ export default {
         }
     },
     computed: {
-        isLogin() {
-            return cookie.get('token') ? 1 : 0
+        isLoginPage() {
+            return !!this.$route.meta.isLoginPage
         }
     }
 }

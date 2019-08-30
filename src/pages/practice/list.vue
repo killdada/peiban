@@ -155,7 +155,7 @@
 </template>
 
 <script>
-import { uploadImg, getAllLesson } from 'src/api/common'
+import { getAllLesson } from 'src/api/common'
 import {
     getPracticeList,
     delPractice,
@@ -169,7 +169,6 @@ import {
 export default {
     data() {
         return {
-            action: uploadImg,
             data: [],
             loading: false,
             total: 0,

@@ -13,7 +13,10 @@ const routes = [
     {
         name: 'login',
         path: '/login',
-        component: () => import('../pages/login/index')
+        component: () => import('../pages/login/index'),
+        meta: {
+            isLoginPage: true
+        }
     },
     // 课程管理
     {

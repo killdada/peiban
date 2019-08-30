@@ -144,7 +144,6 @@
 
 <script>
 import { getCatalogDetail, getPdfimg, bindppt } from 'src/api/lesson'
-import { uploadImg } from 'src/api/common'
 import { qiniuUpload } from 'src/utils/qiniu'
 import { download, localStorageUtils } from 'appcloud-component'
 import videoPlayerComponent from 'src/components/video-player-component'
@@ -188,7 +187,6 @@ export default {
             rules: {
                 ppt: { validator: vaildppt, trigger: ['blur', 'change'] }
             },
-            action: uploadImg,
             imgData: { media_type: 1 },
             loading: false,
             btnloading: false,

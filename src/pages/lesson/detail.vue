@@ -83,7 +83,6 @@
 </template>
 
 <script>
-import { uploadImg } from 'src/api/common'
 import { getCatalogList, delCatalog } from 'src/api/lesson'
 import { localStorageUtils } from 'appcloud-component'
 import catalogDialog from './catalog-dialog'
@@ -92,8 +91,6 @@ import lessonForm from './lesson-form'
 export default {
     data() {
         return {
-            action: uploadImg,
-            imgData: { media_type: 1 },
             data: [
                 {
                     id: 1,
