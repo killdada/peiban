@@ -65,6 +65,12 @@ const menus = [
         icon: 'el-icon-menu',
         title: '素材管理',
         routeName: '素材管理'
+    },
+    {
+        name: 'feedback-manage',
+        icon: 'el-icon-menu',
+        title: '反馈管理',
+        routeName: '反馈管理'
     }
 ]
 

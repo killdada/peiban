@@ -137,6 +137,27 @@ const routes = [
             }
         ]
     },
+    // 反馈列表
+    {
+        name: 'feedback',
+        path: '/feedback',
+        component: () => import('src/pages/index'),
+        redirect: '/feedback/manage',
+        meta: {
+            requireLogin: true
+        },
+        children: [
+            // 反馈列表
+            {
+                name: 'feedback-manage',
+                path: 'manage',
+                component: () => import('src/pages/feedback/index'),
+                meta: {
+                    hasSideBar: true
+                }
+            }
+        ]
+    },
     // 素材管理
     {
         name: 'material',
