@@ -145,8 +145,10 @@ export default {
                         return
                     }
                     this.btnloading = true
+                    // eslint-disable-next-line no-unused-vars
+                    const { imgUrl, ...other } = this.form
                     if (!this.$route.params.id) {
-                        addLesson(this.form)
+                        addLesson(other)
                             .then(() => {
                                 this.$message.success('添加成功')
                                 this.$emit('onsuccess')
@@ -158,7 +160,7 @@ export default {
                                 this.btnloading = false
                             })
                     } else {
-                        updateLesson(this.$route.params.id, this.form)
+                        updateLesson(this.$route.params.id, other)
                             .then(() => {
                                 this.$message.success('编辑成功')
                                 this.$emit('onsuccess')

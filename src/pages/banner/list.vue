@@ -252,10 +252,10 @@ export default {
                         return
                     }
                     this.btnloading = true
+                    // eslint-disable-next-line no-unused-vars
+                    const { img_url, ...other } = this.form
                     if (!this.id) {
-                        addBanner({
-                            ...this.form
-                        })
+                        addBanner(other)
                             .then(() => {
                                 this.$message.success('添加成功')
                                 this.fetchData()
@@ -268,7 +268,7 @@ export default {
                                 this.btnloading = false
                             })
                     } else {
-                        updateBanner(this.id, this.form)
+                        updateBanner(this.id, other)
                             .then(() => {
                                 this.$message.success('编辑成功')
                                 this.fetchData()
