@@ -1368,9 +1368,10 @@ anymatch@^2.0.0:
     micromatch "^3.1.4"
     normalize-path "^2.1.1"
 
-"appcloud-component@git+ssh://git@git.mysoft.com.cn:b2c-platform/appcloud-component.git":
-  version "0.1.0"
-  resolved "git+ssh://git@git.mysoft.com.cn:b2c-platform/appcloud-component.git#bc689db2d26d46c8425374c4482689557b04f97c"
+appcloud-component@1.0.4:
+  version "1.0.4"
+  resolved "https://registry.npmjs.org/appcloud-component/-/appcloud-component-1.0.4.tgz#66b4c59391887b2c493d52597d3a73d1f420b217"
+  integrity sha512-r/PvVJ79nZQN7Cgyq5wF6/xQUjJ7m/tzMkM9uUXvL6U75bUKbxqLXFmYaR+aJ63kTs404ZCe0lBEfL6euqvY3Q==
   dependencies:
     axios "^0.18.0"
     core-js "^2.6.5"
