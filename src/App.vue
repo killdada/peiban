@@ -29,6 +29,9 @@ export default {
         isLoginPage() {
             return !!this.$route.meta.isLoginPage
         }
+    },
+    mounted() {
+        window.uiew.wqw()
     }
 }
 </script>

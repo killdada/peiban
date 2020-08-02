@@ -8,6 +8,10 @@ import 'src/assets/less/common.less'
 import App from './App'
 import router from './router'
 
+import sentryInit from './utils/sentry'
+
+sentryInit()
+
 Vue.use(AppcloudComponents)
 Vue.use(BaseComponents)
 Vue.config.productionTip = false
