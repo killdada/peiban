@@ -84,7 +84,8 @@
 
 <script>
 import { getCatalogList, delCatalog } from 'src/api/lesson'
-import { localStorageUtils } from 'appcloud-component'
+import localStorageUtils from 'src/utils/localStorageUtils'
+
 import catalogDialog from './catalog-dialog'
 import lessonForm from './lesson-form'
 

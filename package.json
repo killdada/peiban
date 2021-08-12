@@ -10,7 +10,6 @@
         "lint": "vue-cli-service lint"
     },
     "dependencies": {
-        "appcloud-component": "git+ssh://git@git.mysoft.com.cn:b2c-platform/appcloud-component.git",
         "axios": "^0.18.0",
         "core-js": "^2.6.5",
         "element-ui": "^2.8.2",

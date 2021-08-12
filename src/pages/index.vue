@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { localStorageUtils } from 'appcloud-component'
+import localStorageUtils from 'src/utils/localStorageUtils'
 
 const menus = [
     {

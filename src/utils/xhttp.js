@@ -1,7 +1,6 @@
 import axios from 'axios'
 import cookie from 'js-cookie'
 import getBaseURL from 'src/const/baseURL'
-import { bus } from 'appcloud-component'
 
 const baseURL = getBaseURL()
 
@@ -48,7 +47,6 @@ xhttp.interceptors.response.use(
         if (res.code === 200 || res.result) {
             return res.data
         }
-        bus.$emit(String(res.code))
         return Promise.reject({
             data: res.data,
             message: res.msg,
@@ -74,7 +72,6 @@ xhttp.interceptors.response.use(
             cookie.remove('token')
             location.reload()
         }
-        bus.$emit(String(error.response.status))
         return Promise.reject(error)
     }
 )

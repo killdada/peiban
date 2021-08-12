@@ -1,12 +1,42 @@
 <template>
     <div class="page-header">
-        <router-link :to="{ name: 'lesson' }">
+        <router-link :to="{ name: 'paas-designer' }">
+            <div class="img"></div>
             <div class="page-header-name">
-                管理后台
+                <span class="line">|</span>
+                开发商后台
             </div>
         </router-link>
-        <ul class="header-left"></ul>
+        <ul class="header-left">
+            <!-- paas设计器 -->
+            <router-link :to="{ name: 'paas-designer' }" tag="li">
+                <a>PaaS设计器</a>
+            </router-link>
+            <!-- 消息管理 -->
+            <router-link :to="{ name: 'message' }" tag="li">
+                <a>消息管理</a>
+            </router-link>
+            <!-- 应用管理 -->
+            <router-link :to="{ name: 'app' }" tag="li">
+                <a>应用管理</a>
+            </router-link>
+            <router-link :to="{ name: 'setting' }" tag="li">
+                <a>设置</a>
+            </router-link>
+            <router-link :to="{ name: 'user' }" tag="li">
+                <a>用户管理</a>
+            </router-link>
+        </ul>
         <ul class="header-right">
+            <!-- 开发文档 -->
+            <li>
+                <a
+                    href="https://doc.mypaas.com.cn/b2c/"
+                    target="_blank"
+                    title="查看开发文档"
+                    >开发文档</a
+                >
+            </li>
             <dropdown-menu
                 placement="bottom-end"
                 v-model="menuStatus.top"
@@ -23,6 +53,11 @@
                     @mouseover="menuStatus.hover = true"
                     @mouseleave="menuStatus.hover = false"
                 >
+                    <li>
+                        <router-link :to="{ name: 'contact' }"
+                            >联系我们</router-link
+                        >
+                    </li>
                     <li class="btn-danger" @click="logout">退出账号</li>
                 </ul>
             </dropdown-menu>
@@ -31,8 +66,8 @@
 </template>
 
 <script>
-import cookie from 'js-cookie'
-import { logOut } from 'src/api/login'
+import { logOut, getUserInfo } from 'src/api/login'
+import { logoutAction } from 'src/utils/xhttp'
 
 export default {
     name: 'Header',
@@ -55,8 +90,16 @@ export default {
 
     methods: {
         fetchData() {
-            this.account =
-                localStorage.getItem('username') || cookie.get('user_name')
+            getUserInfo().then(res => {
+                this.account = res.name
+                localStorage.setItem('tenant_name', res.tenant_name)
+                localStorage.setItem('app_type', res.app_type)
+                localStorage.setItem(
+                    'has_english_version',
+                    res.has_english_version
+                )
+                localStorage.setItem('fast_user_account', res.name)
+            })
         },
         keepMenu() {
             this.menuStatus.top = this.menuStatus.top || this.menuStatus.role
@@ -83,8 +126,7 @@ export default {
             })
                 .then(() => {
                     logOut().then(() => {
-                        cookie.remove('token')
-                        location.reload()
+                        logoutAction()
                     })
                 })
                 .catch(() => {
@@ -96,7 +138,13 @@ export default {
 </script>
 
 <style lang="less">
-@import '~assets/less/var.less';
+@import '../assets/less/var.less';
+
+@img: '../assets/img';
+
+.header-center .page-header {
+    width: @width-index;
+}
 
 .page-header {
     display: flex;
@@ -122,6 +170,19 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        .img {
+            width: 150px;
+            height: 100%;
+            margin-left: 20px;
+            background: url('@{img}/logo_paas_nor.png') left center no-repeat;
+            background-size: contain;
+        }
+        // width: 150px;
+        // // flex: 150px 0 0;
+        // height: 100%;
+        // margin-left: 20px;
+        // // text-indent: -1000px;
+        // background: url('@{img}/logo_paas_nor.png') left center no-repeat;
     }
 
     ul {

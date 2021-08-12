@@ -8,7 +8,7 @@
 
 <script>
 import cookie from 'js-cookie'
-import loginComponent from 'appcloud-component/src/page/login'
+import loginComponent from './login'
 import { login } from 'src/api/login'
 
 export default {
