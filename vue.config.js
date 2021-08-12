@@ -13,6 +13,7 @@ const alias = {
 module.exports = {
     lintOnSave: false,
     runtimeCompiler: true,
+    publicPath: '/public',
     devServer: {
         port: 8888,
         open: true,
