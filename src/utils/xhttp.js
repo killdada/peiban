@@ -7,6 +7,9 @@ const baseURL = getBaseURL()
 const requestMap = {}
 
 const xhttp = axios.create({
+    headers: {
+        Authorization: `Bearer ${cookie.get('el-time-range-picker__content')}`
+    },
     baseURL
 })
 
@@ -23,6 +26,9 @@ xhttp.interceptors.request.use(config => {
         config.url = `${config.url}${
             config.url.indexOf('?') !== -1 ? '&' : '?'
         }token=${token}`
+        config.headers = {
+            Authorization: `Bearer ${token}`
+        }
     }
     return config
 })
