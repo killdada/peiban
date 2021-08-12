@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import store from 'src/store'
 import cookie from 'js-cookie'
-import AppcloudComponents from 'appcloud-component'
 import BaseComponents from 'components'
+import AppcloudComponents from './baseComponents'
 import 'src/assets/less/common.less'
 
 import App from './App'

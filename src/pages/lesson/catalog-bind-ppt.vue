@@ -54,9 +54,7 @@
                             <el-carousel-item
                                 v-for="(img, index) in form.ppt"
                                 :style="{
-                                    backgroundImage: `url(${
-                                        img.media_real_url
-                                    })`
+                                    backgroundImage: `url(${img.media_real_url})`
                                 }"
                                 :key="index"
                             >
@@ -145,7 +143,9 @@
 <script>
 import { getCatalogDetail, getPdfimg, bindppt } from 'src/api/lesson'
 import { qiniuUpload } from 'src/utils/qiniu'
-import { download, localStorageUtils } from 'appcloud-component'
+import localStorageUtils from 'src/utils/localStorageUtils'
+import download from 'src/utils/download'
+
 import videoPlayerComponent from 'src/components/video-player-component'
 
 const pptTimeDefault = ['00:00:00', '00:00:00']
