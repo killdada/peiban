@@ -12,7 +12,7 @@ export default function getBaseURL() {
         baseUrl = '/api/v1/backend'
     }
 
-    if (process.env.VUE_APP_VERCEL === 1) {
+    if (process.env.VUE_APP_VERCEL === '1') {
         return 'https://peiban-backend.yenmysoft.com.cn'
     }
     return baseUrl

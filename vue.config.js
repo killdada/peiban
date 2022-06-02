@@ -7,18 +7,20 @@ LodashModuleReplacementPlugin.__expression = `require('lodash-webpack-plugin')`
 const alias = {
     src: path.resolve(__dirname, 'src'),
     assets: path.resolve(__dirname, 'src/assets'),
-    components: path.resolve(__dirname, 'src/components'),
+    components: path.resolve(__dirname, 'src/components')
 }
+
+console.log('11', process.env.VUE_APP_VERCEL === '1')
 
 module.exports = {
     lintOnSave: false,
     runtimeCompiler: true,
-    publicPath: '/public',
+    publicPath: process.env.VUE_APP_VERCEL === '1' ? '/' : '/public',
     devServer: {
         port: 8888,
-        open: true,
+        open: true
     },
-    chainWebpack: (config) => {
+    chainWebpack: config => {
         config.plugins.delete('preload')
         config.plugins.delete('prefetch')
 
@@ -30,8 +32,8 @@ module.exports = {
                 caching: true, // Caches for methods like _.cloneDeep, _.isEqual, & _.uniq
                 flattening: true, // Support “flatten” methods & flattening rest arguments
                 paths: true, // Deep property path support for methods like _.get, _.has, & _.set
-                shorthands: true,
-            },
+                shorthands: true
+            }
         ])
-    },
+    }
 }
