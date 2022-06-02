@@ -26,6 +26,9 @@ xhttp.interceptors.request.use(config => {
         config.url = `${config.url}${
             config.url.indexOf('?') !== -1 ? '&' : '?'
         }token=${token}`
+        config.headers = {
+            Authorization: `Bearer ${token}`
+        }
     }
     return config
 })
