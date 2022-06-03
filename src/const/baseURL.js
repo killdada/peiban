@@ -13,7 +13,7 @@ export default function getBaseURL() {
     }
 
     if (process.env.VUE_APP_VERCEL === '1') {
-        return 'https://peiban-backend.yenmysoft.com.cn'
+        return 'https://peiban-backend.yenmysoft.com.cn/api/v1/backend'
     }
     return baseUrl
 }
